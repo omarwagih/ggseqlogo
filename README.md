@@ -1,4 +1,5 @@
-<img src="https://cdn.rawgit.com/omarwagih/img" alt="ggseqlogo" width="250px"><br>
+<img src="https://cdn.rawgit.com/omarwagih/ggseqlogo/master/inst/extdata/images/logo.svg" alt="rmimp logo" width="250px"><br>
+
 <h3>Beautiful and versatile sequence logos in R</h3>
 ===============================================================
 
