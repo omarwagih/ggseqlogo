@@ -1,0 +1,10 @@
+Package: ggseqlogo
+Type: Package
+Title: Beautiful and versatile sequence logos
+Version: 0.0.1
+Date: 2017-02-18
+Author: Omar Wagih
+Maintainer: Omar Wagih <wagih@ebi.ac.uk>
+Description: Plot sequence logos using ggplot2
+License: LGPL
+RoxygenNote: 5.0.1
