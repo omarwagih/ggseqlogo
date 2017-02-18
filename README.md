@@ -26,7 +26,7 @@ seqs_dna = seqs_list[[1]]
 ggplot() + geom_logo(seqs_dna) + theme_logo()
 ```
 
-<img src="inst/images/fig1.png" width="350px"><br>
+<img src="inst/images/fig1.png" width="450px"><br>
 
 ## Color schemes
 ggseqlogo has preset color schemes that can be set using the `col_scheme` parameter. By default, the `col_scheme` is set to `auto` such that the color scheme is automatically chosen based on your sequence type. 
@@ -38,7 +38,7 @@ For amino acids you can pick from the following `chemistry`, `hydrophobicity`, `
 ggplot() + geom_logo(seqs_dna, col_scheme='base_pairing') + theme_logo()
 ```
 
-<img src="inst/images/fig2.png" width="350px"><br>
+<img src="inst/images/fig2.png" width="450px"><br>
 
 ### Custom color schemes
 If the presets are not enough for you, you can define custom discrete or continuous color schemes using the `make_col_scheme` function. 
@@ -55,7 +55,7 @@ ggplot() + geom_logo(seqs_dna, col_scheme=cs1) + theme_logo()
 Note that the `groups` parameter here is optional
 
 
-<img src="inst/images/fig3.png" width="350px"><br>
+<img src="inst/images/fig3.png" width="450px"><br>
 
 #### Continuous color schemes:
 
@@ -66,7 +66,7 @@ ggplot() + geom_logo(seqs_dna, col_scheme=cs2) + theme_logo()
 ```
 
 
-<img src="inst/images/fig4.png" width="350px"><br>
+<img src="inst/images/fig4.png" width="450px"><br>
 
 
 ## Facets
@@ -79,7 +79,7 @@ ggplot() + geom_logo(seqs_list, method='p') +
 ```
 
 
-<img src="inst/images/fig5.png" width="350px"><br>
+<img src="inst/images/fig5.png" width="450px"><br>
 
 
 ## Sequence types
@@ -92,7 +92,7 @@ ggplot() +
 	theme_logo()
 ```
 
-<img src="inst/images/fig6.png" width="350px"><br>
+<img src="inst/images/fig6.png" width="450px"><br>
 
 ## Fonts
 Currently two fonts are available, with more added soon.
@@ -107,7 +107,7 @@ ggplot() + geom_logo(seqs_dna, font=2) + theme_logo()
 ``` 
 
 
-<img src="inst/images/fig7.png" width="350px"><br>
+<img src="inst/images/fig7.png" width="450px"><br>
 
 ## Documentation
 For more details on all features and parameters see `?geom_logo` and `?make_col_scheme`
