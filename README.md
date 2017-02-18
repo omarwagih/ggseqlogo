@@ -73,8 +73,7 @@ ggplot() + geom_logo(seqs_dna, col_scheme=cs2) + theme_logo()
 You can plot more than one sequence logo with the help of facets. `geom_logo` will accept a named list of sequences
 
 ```r			   
-ggplot() + geom_logo(seqs_list, method='p') + 
-  theme_logo() + 
+ggplot() + geom_logo(seqs_list) + theme_logo() + 
   facet_wrap(~seq_group, ncol=1, scales='free_x') 
 ```
 
