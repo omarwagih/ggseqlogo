@@ -30,7 +30,8 @@ get_col_scheme = function(col_scheme, seq_type='auto'){
     if(seq_type == 'auto') stop('"col_scheme" and "seq_type" cannot both be "auto"')
     
     col_scheme = switch(tolower(seq_type), aa = 'chemistry', 
-                        dna = 'nucleotide', rna = 'nucleotide')
+                        dna = 'nucleotide', rna = 'nucleotide', 
+                        other='nucleotide')
 
   }
   

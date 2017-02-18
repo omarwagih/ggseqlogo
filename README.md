@@ -1,7 +1,5 @@
-<img src="https://cdn.rawgit.com/omarwagih/ggseqlogo/master/inst/extdata/images/logo.svg" alt="rmimp logo" width="250px"><br>
+<img src="https://cdn.rawgit.com/omarwagih/ggseqlogo/1ae09503/inst/images/logo.svg" alt="ggseqlogo logo" width="350px"><br>
 
-<h3>Beautiful and versatile sequence logos in R</h3>
-===============================================================
 
 ## Installation
 Install ggseqlogo using the `devtools` package:
@@ -27,6 +25,8 @@ seqs_dna = seqs_list[[1]]
 ggplot() + geom_logo(seqs_dna) + theme_logo()
 ```
 
+<img src="inst/images/fig1.png" width="350px"><br>
+
 ## Color schemes
 ggseqlogo has preset color schemes that can be set using the `col_scheme` parameter. By default, the `col_scheme` is set to `auto` such that the color scheme is automatically chosen based on your sequence type. 
 
@@ -36,6 +36,8 @@ For amino acids you can pick from the following `chemistry`, `hydrophobicity`, `
 ```r
 ggplot() + geom_logo(seqs_dna, col_scheme='base_pairing') + theme_logo()
 ```
+
+<img src="inst/images/fig2.png" width="350px"><br>
 
 ### Custom color schemes
 If the presets are not enough for you, you can define custom discrete or continuous color schemes using the `make_col_scheme` function. 
@@ -51,17 +53,19 @@ ggplot() + geom_logo(seqs_dna, col_scheme=cs1) + theme_logo()
 
 Note that the `groups` parameter here is optional
 
-[PLOT]
+
+<img src="inst/images/fig3.png" width="350px"><br>
 
 #### Continuous color schemes:
 
 ```
 cs2 = make_col_scheme(chars=c('A', 'T', 'C', 'G'), values=1:4)
 
-ggplot() + geom_logo(seqs_dna, col_scheme=cs1) + theme_logo()
+ggplot() + geom_logo(seqs_dna, col_scheme=cs2) + theme_logo()
 ```
 
-[PLOT]
+
+<img src="inst/images/fig4.png" width="350px"><br>
 
 
 ## Facets
@@ -73,7 +77,8 @@ ggplot() + geom_logo(seqs_list, method='p') +
   facet_wrap(~seq_group, ncol=1, scales='free_x') 
 ```
 
-[PLOT]
+
+<img src="inst/images/fig5.png" width="350px"><br>
 
 
 ## Sequence types
@@ -86,7 +91,7 @@ ggplot() +
 	theme_logo()
 ```
 
-[PLOT]
+<img src="inst/images/fig6.png" width="350px"><br>
 
 ## Fonts
 Currently two fonts are available, with more added soon.
@@ -100,7 +105,8 @@ You can adjust the font by setting the `font` parameter:
 ggplot() + geom_logo(seqs_dna, font=2) + theme_logo()
 ``` 
 
-[PLOT]
+
+<img src="inst/images/fig7.png" width="350px"><br>
 
 ## Feedback
 If you have any feedback or suggestions, please drop me a line at (omarwagih(at)gmail.com) or open an issue on github.
