@@ -108,5 +108,9 @@ ggplot() + geom_logo(seqs_dna, font=2) + theme_logo()
 
 <img src="inst/images/fig7.png" width="350px"><br>
 
+## Documentation
+For more details on all features and parameters see `?geom_logo` and `?make_col_scheme`
+
+
 ## Feedback
 If you have any feedback or suggestions, please drop me a line at (omarwagih(at)gmail.com) or open an issue on github.
