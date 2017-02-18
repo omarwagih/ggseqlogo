@@ -39,7 +39,7 @@ get_font <- function(font){
   
   if(!exists(font_obj_name, envir = .GlobalEnv)){
     # Not loaded into global env yet - load it into global
-    font_path = file.path(GGSEQLOGO_BASE, font_filename)
+    font_path = file.path(GGSEQLOGO_FONT_BASE, font_filename)
     assign(font_obj_name, readRDS(font_path), envir = .GlobalEnv)
   }
   
