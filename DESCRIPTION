@@ -7,4 +7,5 @@ Author: Omar Wagih
 Maintainer: Omar Wagih <wagih@ebi.ac.uk>
 Description: Plot sequence logos using ggplot2
 License: LGPL
+Imports: ggplot2
 RoxygenNote: 5.0.1
