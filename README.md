@@ -12,6 +12,7 @@ install_github("omarwagih/ggseqlogo")
 
 ## Getting started
 ```r
+require(ggplot2)
 require(ggseqlogo)
 
 # Some example DNA sequences
