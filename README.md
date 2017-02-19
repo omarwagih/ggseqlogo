@@ -1,4 +1,4 @@
-<img src="https://cdn.rawgit.com/omarwagih/ggseqlogo/fb290fe8/inst/images/logo.svg" alt="ggseqlogo logo" width="350px"><br>
+<img src="https://cdn.rawgit.com/omarwagih/ggseqlogo/643fa6fa/inst/images/logo.svg" alt="ggseqlogo logo" width="350px"><br>
 
 
 ## Installation
