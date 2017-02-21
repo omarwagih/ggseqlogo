@@ -147,9 +147,11 @@ findNamespace <- function(letter_mat, seq_type, namespace){
 #' @param pwm Position weight matrix
 #' @param N Number of letters in namespace
 #' @param Nseqs Number of sequences in PWM
-computeBits <- function(pwm, N=4, Nseqs){
+computeBits <- function(pwm, N=4, Nseqs=NULL){
   H_i = - apply(pwm, 2, function(col) sum(col * log2(col), na.rm=T))
-  e_n = (1/logb(2)) * (N-1)/(2*Nseqs) 
+  e_n = 0
+  if(!is.null(Nseqs)) e_n = (1/logb(2)) * (N-1)/(2*Nseqs) 
+ 
   R_i = log2(N) - (H_i  + e_n)
   # Set any negatives to 0
   R_i = pmax(R_i, 0)
@@ -164,44 +166,75 @@ computeBits <- function(pwm, N=4, Nseqs){
 #' @param namespace letters used for matrix construction
 makePFM <- function(seqs, seq_type='auto', priors='eq', namespace=NULL){
   
-  # Number of positions in alignment
-  num_pos = nchar(seqs[1])
-  
-  # Number of sequences
-  nseqs = length(seqs)
-  
-  # Letter matrix
-  letter_mat = letterMatrix(seqs)
-  
-  
-  # Get namespace
-  ns = findNamespace(letter_mat, seq_type, namespace)
-  namespace = ns$namespace
-  seq_type = ns$seq_type
+  if(is.matrix(seqs)){
+    # Process matrix
+    if(is.null(rownames(seqs))) stop('Matrix must have letters for row names')
+    
+    num_pos = ncol(seqs)
+    
+    # Get namespace
+    ns = findNamespace(rownames(seqs), seq_type, namespace)
+    namespace = ns$namespace
+    seq_type = ns$seq_type
+    
+    nseqs = NULL
+    
+    bg_prob = NA
+    pfm_mat = seqs
+    pfm_mat = apply(pfm_mat, 2, function(x) x / sum(x, na.rm=T))
+    
+    missing_rows = setdiff(namespace, rownames(pfm_mat))
+    
+    if(length(missing_rows) > 0){
+      miss = matrix(rep(0, length(missing_rows) * ncol(pfm_mat)), nrow=length(missing_rows), dimnames = list(missing_rows))
+      pfm_mat = rbind(pfm_mat, miss)
+    }
+    
+    pfm_mat = pfm_mat[namespace,]
+    
+  }else{
+    # Process sequences
+    
+    # Number of positions in alignment
+    num_pos = nchar(seqs[1])
+    # Number of sequences
+    nseqs = length(seqs)
+    # Letter matrix
+    letter_mat = letterMatrix(seqs)
+    
+    
+    # Get namespace
+    ns = findNamespace(letter_mat, seq_type, namespace)
+    namespace = ns$namespace
+    seq_type = ns$seq_type
+    
+    # Get priors
+    my_priors = getPriors(priors, seq_type, namespace)
+    
+    # Match priors to namespace 
+    bg_prob = my_priors[match(namespace, names(my_priors))]
+    
+    # Construct PWM
+    pfm_mat = apply(letter_mat, 2, function(pos.data){
+      # Get frequencies 
+      t = table(pos.data)
+      # Match to aa
+      ind = match(namespace, names(t))
+      # Create column
+      col = t[ind]
+      col[is.na(col)] = 0
+      names(col) = namespace
+      # Do relative frequencies
+      col = col / sum(col)
+      col
+    })
+    
+    mat = matrix((letter_mat %in% namespace), nrow=nrow(letter_mat))
+    attr(pfm_mat, 'nongapped') = apply(mat, 2, sum)/nseqs
+  }
   
   # Number of letters in ns
   N = length(namespace)
-  
-  # Get priors
-  my_priors = getPriors(priors, seq_type, namespace)
-  
-  # Match priors to namespace 
-  bg_prob = my_priors[match(namespace, names(my_priors))]
-  
-  # Construct PWM
-  pfm_mat = apply(letter_mat, 2, function(pos.data){
-    # Get frequencies 
-    t = table(pos.data)
-    # Match to aa
-    ind = match(namespace, names(t))
-    # Create column
-    col = t[ind]
-    col[is.na(col)] = 0
-    names(col) = namespace
-    # Do relative frequencies
-    col = col / sum(col)
-    col
-  })
   
   # Assign seq type and namespace as attributes
   attr(pfm_mat, 'seq_type') = seq_type
@@ -209,8 +242,6 @@ makePFM <- function(seqs, seq_type='auto', priors='eq', namespace=NULL){
 
   # Non-gapped columns
   if(seq_type == 'aa') namespace = c(namespace, 'X', 'B', 'Z')
-  mat = matrix((letter_mat %in% namespace), nrow=nrow(letter_mat))
-  attr(pfm_mat, 'nongapped') = apply(mat, 2, sum)/nseqs
 
   # Information content
   attr(pfm_mat, 'bits') = computeBits(pfm_mat, N, nseqs)
@@ -282,3 +313,11 @@ getHeightData <- function(pwm, method, decreasing=T){
   
   dat
 }
+
+
+
+
+
+
+
+

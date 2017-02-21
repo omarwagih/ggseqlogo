@@ -47,6 +47,11 @@ get_font <- function(font){
   get(font_obj_name, envir = .GlobalEnv)
 }
 
+
+validate_pfm <- function(pfm){
+  #apply(pfm, 1, )
+}
+
 #' Generate height data for logo
 logo_data <- function( seqs, method='bits', stack_width=0.95, 
                        rev_stack_order=F, font=1, seq_group=1, 
@@ -59,7 +64,9 @@ logo_data <- function( seqs, method='bits', stack_width=0.95,
   pfm = makePFM(seqs, seq_type = seq_type, namespace = namespace)
   
   # Get height data
-  hh = getHeightData(pfm, method = method, decreasing = rev_stack_order)
+  hfun = getHeightData
+  #if(method == 'log') hfun = getHeightData2
+  hh = hfun(pfm, method = method, decreasing = rev_stack_order)
   
   ff = merge(sf_df, hh, by = 'letter')
   
@@ -124,7 +131,7 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
   method = all_methods[pind]
   
   # Convert character seqs to list
-  if(is.character(data)) data = list("1"=data)
+  if(is.character(data) | is.matrix(data)) data = list("1"=data)
   
   if(is.list(data)){
     # Set names for list if they dont exist
@@ -194,7 +201,6 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
     x = 1: floor( lim[2]-(stack_width/2) )
   }
   
-  #,  coord_cartesian(xlim=x_lim)
   list(logo_layer, scale_x_continuous(breaks = breaks_fun, labels = identity), 
        ylab(y_lab), xlab(''), colscale_opts, guides_opts)
 }
