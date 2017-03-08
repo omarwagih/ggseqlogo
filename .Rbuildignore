@@ -1,2 +1,2 @@
 inst/images/.*$
-
+^\.travis\.yml$

@@ -1,17 +1,13 @@
 # if(T){
 #   require(ggplot2)
 #   setwd('~/Development/ggseqlogo/')
-#   source('R/heights.r')
+#   source('R/heights_new.r')
 #   source('R/col_schemes.r')
 #   GGSEQLOGO_FONT_BASE = '~/Development/ggseqlogo/inst/fonts/'
 # }
 
 
-#' Change range of values
-#' 
-#' @param old_vals values to transform
-#' @param new_min minimum range of transformed data
-#' @param new_max maximum range of transformed data
+# Change range of values
 newRange <- function(old_vals, new_min=0, new_max=1){
   old_min = min(old_vals)
   old_max = max(old_vals)
@@ -20,9 +16,7 @@ newRange <- function(old_vals, new_min=0, new_max=1){
   new_vals
 }
 
-#' Read font from file if not in global envir.
-#' 
-#' @param font font id as index of all_fonts vector
+# Read font from file if not in global envir.
 get_font <- function(font){
   
   if(exists('GGSEQLOGO_FONT_BASE', envir = .GlobalEnv)){
@@ -52,21 +46,26 @@ validate_pfm <- function(pfm){
   #apply(pfm, 1, )
 }
 
-#' Generate height data for logo
-logo_data <- function( seqs, method='bits', stack_width=0.95, 
+# Generate height data for logo
+logo_data <- function( seqs, seqs_bg=NULL, method='bits', stack_width=0.95, 
                        rev_stack_order=F, font=1, seq_group=1, 
-                        seq_type = 'auto', namespace=NULL ){
+                       seq_type = 'auto', namespace=NULL ){
 
   # Get font 
   sf_df = get_font(font)
   
-  # Make weight matrix
-  pfm = makePFM(seqs, seq_type = seq_type, namespace = namespace)
-  
-  # Get height data
-  hfun = getHeightData
-  #if(method == 'log') hfun = getHeightData2
-  hh = hfun(pfm, method = method, decreasing = rev_stack_order)
+  if(method == 'bits'){
+    hh = bits_method(seqs, decreasing = rev_stack_order, seq_type = seq_type, namespace = namespace)
+  }else if(method == 'probability'){
+    hh = probability_method(seqs, decreasing = rev_stack_order, seq_type = seq_type, namespace = namespace)
+  }else if(method == 'tsl'){
+    hh = twosamplelogo_method(seqs, seqs_bg, pval_thresh=0.05, seq_type = seq_type, namespace = namespace)
+  }else if(method == 'custom'){
+    if(seq_type == 'auto') seq_type = guessSeqType(rownames(seqs))
+    hh = matrix_to_heights(seqs, seq_type, decreasing = rev_stack_order)
+  }else{
+    stop('Invalid method!')
+  }
   
   ff = merge(sf_df, hh, by = 'letter')
   
@@ -78,9 +77,7 @@ logo_data <- function( seqs, method='bits', stack_width=0.95,
   ff = as.data.frame(ff)[,c('x', 'y', 'letter', 'position', 'order')]
   ff$seq_group = seq_group
   
-  
-  
-  attr(ff, 'seq_type') = attr(pfm, 'seq_type')
+  attr(ff, 'seq_type') = attr(hh, 'seq_type')
   ff
 }
 
@@ -103,6 +100,8 @@ theme_logo <- function(base_size=14, base_family=''){
 #' @param method Height method, can be one of "bits" or "probability" (default: "bits")
 #' @param seq_type Sequence type, can be one of "auto", "aa", "dna", "rna" or "other" 
 #' (default: "auto", sequence type is automatically guessed)
+#' @param namespace Character vector of single letters to be used for custom namespaces
+#' @param font Integer specifying font
 #' @param stack_width Width of letter stack between 0 and 1 (default: 0.95)
 #' @param rev_stack_order If \code{TRUE}, order of letter stack is reversed (default: FALSE)
 #' @param col_scheme Color scheme applied to the sequence logo, can be one of the following: 
@@ -116,7 +115,7 @@ theme_logo <- function(base_size=14, base_family=''){
 #' 
 #' @export
 #' @import ggplot2
-geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NULL,
+geom_logo <- function(data = NULL, seqs_bg = NULL, method='bits', seq_type='auto', namespace=NULL,
                       font=1, stack_width=0.95, rev_stack_order=F, col_scheme = 'auto',
                       low_col='black', high_col='yellow', na_col='grey20',
                       plot=T, ...) {
@@ -125,9 +124,9 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
   if(is.null(data)) stop('Missing "data" parameter!')
   
   # Validate method
-  all_methods = c('bits', 'probability')
+  all_methods = c('bits', 'probability', 'custom')#, 'tsl')
   pind = pmatch(method, all_methods)
-  if(length(pind) != 1) stop("method must be one of 'bits' or 'probability'")
+  if(length(pind) != 1) stop("method must be one of 'bits' or 'probability', or 'custom'")
   method = all_methods[pind]
   
   # Convert character seqs to list
@@ -142,7 +141,7 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
     # We have list of sequences - loop and rbind
     data_sp = lapply(names(data), function(n){
       curr_seqs = data[[n]]
-      logo_data(seqs = curr_seqs, method = method, stack_width = stack_width, 
+      logo_data(seqs = curr_seqs, seqs_bg = seqs_bg, method = method, stack_width = stack_width, 
                 rev_stack_order = rev_stack_order, seq_group = n, seq_type = seq_type, 
                 font = font, namespace=namespace)
     })
@@ -185,24 +184,48 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
   guides_opts = NULL
   if(identical(cs$letter, cs$group)) guides_opts = guides(fill=F)
   
+  assign('data', data, envir = .GlobalEnv)
+  y_lim = NULL
+  extra_opts = NULL
+  if(method == 'tsl'){
+    y_lab = 'Depleted    Enriched'
+    tmp = max(abs(data$y))
+    #y_lim = c(-tmp, tmp)
+    row_a = row_b = data[1,]
+    row_a$y = -tmp
+    row_b$y = tmp
+    data = rbind(data, row_a, row_b)
+    data$facet = factor(data$y > 0, c(T, F), c('Enriched', 'Depleted'))
+    extra_opts = NULL#facet_grid(facet~., scales='free')
+  }else if(method == 'custom'){
+    y_lab = ''
+  }else{
+    y_lab = method
+    substr(y_lab, 1, 1) = toupper(substr(y_lab, 1, 1))
+  }
+  
+  
+  data$group_by = with(data, interaction(seq_group, letter, position))
   # Create layer
   logo_layer = layer(
     stat = 'identity', data = data, 
-    mapping = aes(x, y, group=interaction(seq_group, letter, position), fill=group), 
+    mapping = aes_string(x = 'x', y = 'y', fill='group', group='group_by'), 
     geom = 'polygon', 
     position = 'identity', show.legend = NA, inherit.aes = F,
     params = list(na.rm = T, ...)
   ) 
   
-  y_lab = method
-  substr(y_lab, 1, 1) = toupper(substr(y_lab, 1, 1))
+ 
+ 
   
   breaks_fun = function(lim){
     x = 1: floor( lim[2]-(stack_width/2) )
   }
   
+  
+  
   list(logo_layer, scale_x_continuous(breaks = breaks_fun, labels = identity), 
-       ylab(y_lab), xlab(''), colscale_opts, guides_opts)
+       ylab(y_lab), xlab(''), colscale_opts, guides_opts, coord_cartesian(ylim=y_lim), extra_opts)
 }
 
 

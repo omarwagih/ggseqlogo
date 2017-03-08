@@ -1,9 +1,8 @@
-# Color scheme functions
 
-#' Get color scheme
-#' 
-#' @param col_scheme name of color scheme
-#' @param seq_type sequence type of color scheme
+
+# Get color scheme
+# @param col_scheme name of color scheme
+# @param seq_type sequence type of color scheme
 get_col_scheme = function(col_scheme, seq_type='auto'){
   
   # Check if user-defined color scheme
@@ -38,7 +37,7 @@ get_col_scheme = function(col_scheme, seq_type='auto'){
   
   # Pick from default color schemes
   cs = switch(col_scheme, 
-         #' Color scheme based on chemistry of amino acids
+         # Color scheme based on chemistry of amino acids
          chemistry = data.frame(
            letter = c('G', 'S', 'T', 'Y', 'C', 'N', 'Q', 'K', 'R', 'H', 'D', 'E', 'P', 'A', 'W', 'F', 'L', 'I', 'M', 'V'),
            group = c(rep('Polar', 5), rep('Neutral', 2), rep('Basic', 3), rep('Acidic', 2), rep('Hydrophobic', 8)),
@@ -46,7 +45,7 @@ get_col_scheme = function(col_scheme, seq_type='auto'){
            stringsAsFactors = F
          ), 
          
-         #' Hydrophobicity index (PMID: 7108955) from -4.5 to 4.5
+         # Hydrophobicity index (PMID: 7108955) from -4.5 to 4.5
          hydrophobicity = data.frame(
            letter = c('I', 'V', 'L', 'F', 'C', 'M', 'A', 'G', 'T', 'W', 
                       'S', 'Y', 'P', 'H', 'D', 'E', 'N', 'Q', 'K', 'R'),
@@ -111,6 +110,7 @@ get_col_scheme = function(col_scheme, seq_type='auto'){
 #' 
 #' @export
 #' 
+#' @importFrom grDevices col2rgb
 #' @examples 
 #' 
 #' # Discrete color scheme examples

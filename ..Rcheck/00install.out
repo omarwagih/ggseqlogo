@@ -1,0 +1,10 @@
+* installing *source* package ‘ggseqlogo’ ...
+** R
+** inst
+** preparing package for lazy loading
+Warning: package ‘ggplot2’ was built under R version 3.3.2
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded
+* DONE (ggseqlogo)

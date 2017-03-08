@@ -1,0 +1,3 @@
+geom_logo               Plots sequence logo as a layer on ggplot
+make_col_scheme         Create new sequence logo color scheme
+theme_logo              ggseqlogo custom theme

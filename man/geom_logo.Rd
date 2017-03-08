@@ -4,10 +4,10 @@
 \alias{geom_logo}
 \title{Plots sequence logo as a layer on ggplot}
 \usage{
-geom_logo(data = NULL, method = "bits", seq_type = "auto",
-  namespace = NULL, font = 1, stack_width = 0.95, rev_stack_order = F,
-  col_scheme = "auto", low_col = "black", high_col = "yellow",
-  na_col = "grey20", plot = T, ...)
+geom_logo(data = NULL, seqs_bg = NULL, method = "bits",
+  seq_type = "auto", namespace = NULL, font = 1, stack_width = 0.95,
+  rev_stack_order = F, col_scheme = "auto", low_col = "black",
+  high_col = "yellow", na_col = "grey20", plot = T, ...)
 }
 \arguments{
 \item{data}{Character vector of sequences or named list of sequences. All sequences must have same width.}
@@ -16,6 +16,10 @@ geom_logo(data = NULL, method = "bits", seq_type = "auto",
 
 \item{seq_type}{Sequence type, can be one of "auto", "aa", "dna", "rna" or "other" 
 (default: "auto", sequence type is automatically guessed)}
+
+\item{namespace}{Character vector of single letters to be used for custom namespaces}
+
+\item{font}{Integer specifying font}
 
 \item{stack_width}{Width of letter stack between 0 and 1 (default: 0.95)}
 
