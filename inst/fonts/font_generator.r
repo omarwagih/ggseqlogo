@@ -48,14 +48,19 @@ letterObject <- function(ch, fontfamily="Helvetica",
 
 
 # Convert letter to polygon coords
-img2poly <- function(letter, fontfamily, fontface=2, do_thin=T){
+img2poly <- function(letter, fontfamily, fontface=1, do_thin=T, extra_thins=c(), thin_factor=0.22, X=3000){
   
-  message('-- doing letter ', letter)
+  message('-- doing letter ', letter, ' for family ', fontfamily)
   # im = letterObject(letter, fontfamily = fontfamily, fontface = fontface, 
   #                   dim=c(2000,2000), fontsize = 1200)
   
-  im = letterObject(letter, fontfamily = fontfamily, fontface = fontface, 
-                    dim=c(3000,3000), fontsize = 1500)
+  if(file.exists(fontfamily)){
+    # Font family is an image - read it
+    im = jpeg::readJPEG(fontfamily)
+  }else{
+    im = letterObject(letter, fontfamily = fontfamily, fontface = fontface, 
+                      dim=c(X,X), fontsize = X/2)
+  }
   
   message('converting to data frame')
   imdf = gglogo::fortify(im)
@@ -73,8 +78,8 @@ img2poly <- function(letter, fontfamily, fontface=2, do_thin=T){
   lpath2 = gglogo::mainPlusIslands(letterpath2)
   lpath2$letter = letter
   
-  if(do_thin==T & letter %in% c('i', 'j', 'l')){
-    lpath2$x = newRange(lpath2$x, 0.2, 0.8)
+  if(do_thin==T & letter %in% c('i', 'j', 'l', '1', extra_thins)){
+    lpath2$x = newRange(lpath2$x, thin_factor, 1-thin_factor)
   }else{
     lpath2$x = newRange(lpath2$x, 0, 1)
   }
@@ -84,14 +89,14 @@ img2poly <- function(letter, fontfamily, fontface=2, do_thin=T){
 }
 
 
-makePolyFont <- function(fontfamily, fontface=2, I_fontfamily=fontfamily, is_bold=F, cores=1){
+makePolyFont <- function(fontfamily, fontface=2, I_fontfamily=fontfamily, is_bold=F, 
+                         cores=1, X=3000, extra_thins=c(), thin_factor=0.22){
   
   chars = c(0:9, letters, LETTERS)
   #chars = 'Q'
   dat = mclapply(X=chars, mc.cores=cores, FUN=function(ch){
     ff = ifelse(ch == "I", I_fontfamily, fontfamily)
-    ff2 = ifelse(ch == "I" & is_bold, 2, fontface)
-    img2poly(ch, ff, ff2)
+    img2poly(ch, ff, X=X, extra_thins = extra_thins, thin_factor = thin_factor)
   })
   
   as.data.frame( rbindlist(dat) )
@@ -99,20 +104,87 @@ makePolyFont <- function(fontfamily, fontface=2, I_fontfamily=fontfamily, is_bol
 
 
 
-plot_font = function(file){
-  
-}
+
 
 setwd('~/Development/ggseqlogo/inst/fonts/')
+
+# if(F){
+#   # SF bold
+#   sf_bold = makePolyFont(fontfamily = 'SF UI Text', fontface = 2, I_fontfamily = 'Menlo', cores=4)
+#   saveRDS(sf_bold, 'sf_bold.rds')
+#   
+#   # SF regular
+#   sf_regular = makePolyFont(fontfamily = 'SF UI Text', I_fontfamily = 'Menlo', fontface = 1, cores=4)
+#   saveRDS(sf_regular, 'sf_regular.rds')
+# }
+
+
+#______ Roboto: sansserif ______
 if(F){
-  # SF bold
-  sf_bold = makePolyFont(fontfamily = 'SF UI Text', fontface = 2, I_fontfamily = 'Menlo', cores=4)
-  saveRDS(sf_bold, 'sf_bold.rds')
+  # Bold
+  roboto_bold = makePolyFont(fontfamily = 'Roboto-Bold', I_fontfamily = 'Menlo-Bold', cores=3)
+  saveRDS(roboto_bold, 'roboto_bold.font')
   
-  # SF regular
-  sf_regular = makePolyFont(fontfamily = 'SF UI Text', I_fontfamily = 'Menlo', fontface = 1, cores=4)
-  saveRDS(sf_regular, 'sf_regular.rds')
+  # Bold
+  roboto_regular = makePolyFont(fontfamily = 'Roboto-Regular', I_fontfamily = 'Menlo-Regular', cores=3)
+  saveRDS(roboto_regular, 'roboto_regular.font')
+  
+  # Medium
+  roboto_medium = makePolyFont(fontfamily = 'Roboto-Medium', I_fontfamily = 'Menlo-Bold', cores=3)
+  saveRDS(roboto_medium, 'roboto_medium.font')
+}
+
+
+#______ Akrobat: sansserif ______
+if(F){
+  # Bold
+  akrobat_bold = makePolyFont(fontfamily = 'Akrobat-Bold', I_fontfamily = 'Menlo-Bold', cores=3)
+  saveRDS(akrobat_bold, 'akrobat_bold.font')
+  
+  # Bold
+  akrobat_regular = makePolyFont(fontfamily = 'Akrobat-Regular', I_fontfamily = 'Menlo-Regular', cores=3)
+  saveRDS(akrobat_regular, 'akrobat_regular.font')
 }
 
 
 
+#______ Roboto slab: serif ______
+if(F){
+  # Bold
+  roboto_slab_bold = makePolyFont(fontfamily = 'RobotoSlab-Bold', cores=3)
+  saveRDS(roboto_slab_bold, 'roboto_slab_bold.font')
+  
+  # Regular
+  roboto_slab_regular = makePolyFont(fontfamily = 'RobotoSlab-Regular', cores=3)
+  saveRDS(roboto_slab_bold, 'roboto_slab_regular.font')
+  
+  # Light
+  roboto_slab_light = makePolyFont(fontfamily = 'RobotoSlab-Light', cores=3)
+  saveRDS(roboto_slab_light, 'roboto_slab_light.font')
+}
+
+
+#______ XKCD font ______
+if(F){
+  xkcd_regular = makePolyFont(fontfamily = 'xkcd-Regular', I_fontfamily = 'RoughNotesSample', 
+                              extra_thins = '1', cores=3)
+  saveRDS(xkcd_regular, 'xkcd_regular.font')
+}
+
+
+
+
+#______ Helvetica: sansserif ______
+if(T){
+  # Bold
+  # helvetica_bold = makePolyFont(fontfamily = 'Helvetica-Bold', I_fontfamily = 'Menlo-Bold', cores=6)
+  # saveRDS(helvetica_bold, 'helvetica_bold.font')
+  
+  # Regular
+  helvetica_regular = makePolyFont(fontfamily = 'Helvetica', I_fontfamily = 'Menlo-Regular', cores=6)
+  saveRDS(helvetica_regular, 'helvetica_regular.font')
+  
+  # Light
+  helvetica_light = makePolyFont(fontfamily = 'Helvetica-Light', I_fontfamily = 'Menlo-Regular', cores=6)
+  saveRDS(helvetica_light, 'helvetica_light.font')
+}

@@ -18,7 +18,6 @@ letterMatrix <- function(input){
   t( matrix(split, seq.len, length(split)/num_pos) )
 }
 
-
 # Guess sequence type based on letter matrix
 # 
 # @param sp letters
@@ -62,11 +61,11 @@ findNamespace <- function(letter_mat, seq_type, namespace){
       stop('All letters in the namespace must be alphanumeric')
     
     # Ensure there is something in each column
-    apply(letter_mat, 2, function(column_letters){
-      int = intersect(namespace, column_letters)
-      if(length(int) == 0)
-        stop('The alignment has no letters in namespace match aligned sequences in at least one column')
-    })
+    # apply(letter_mat, 2, function(column_letters){
+    #   int = intersect(namespace, column_letters)
+    #   if(length(int) == 0)
+    #     stop('The alignment has no letters in namespace match aligned sequences in at least one column')
+    # })
     
   }else{
     if(!is.null(namespace)) 
@@ -77,10 +76,10 @@ findNamespace <- function(letter_mat, seq_type, namespace){
       seq_type = guessSeqType(sp)
     
     # Get predefined namespace
-    namespace = get( sprintf('.%s_NAMESPACE', seq_type) )()
+    namespace = get( sprintf('.%s_NAMESPACE', toupper(seq_type)) )()
   }
   
-  return(list(seq_type = seq_type, 
+  return(list(seq_type = toupper(seq_type), 
               namespace = namespace))
 }
 
@@ -106,7 +105,7 @@ computeBits <- function(pwm, N=4, Nseqs=NULL){
 # @param namespace letters used for matrix construction
 # @param keep_letter_mat Keep letter matrix for some height methods
 makePFM <- function(seqs, seq_type='auto', namespace=NULL, keep_letter_mat=F){
- 
+  
   letter_mat = NA
   if(is.matrix(seqs)){
     # Process matrix
@@ -198,6 +197,9 @@ makePFM <- function(seqs, seq_type='auto', namespace=NULL, keep_letter_mat=F){
 ######################
 
 # General function to convert matrix of heights to polygon data frame 
+# @param mat matrix of heghts
+# @param seq_type sequence type
+# @decreasing Sets order of letters, high to low or low to high
 matrix_to_heights <- function(mat, seq_type, decreasing=T){
   
   mat[is.infinite(mat)] = 0 
@@ -251,15 +253,13 @@ matrix_to_heights <- function(mat, seq_type, decreasing=T){
   rownames(dat) = NULL
   
   attr(dat, 'seq_type') = seq_type
-  assign('dat', dat, envir = .GlobalEnv)
-  # stop('done')
   
   dat
 }
 
 
 
-
+# Shannon entropy method
 bits_method <- function(seqs, decreasing, ...){
   # Make PFM
   pfm = makePFM(seqs, ...)
@@ -273,7 +273,7 @@ bits_method <- function(seqs, decreasing, ...){
   matrix_to_heights(heights, seq_type, decreasing)
 } 
 
-
+# Probability method
 probability_method <- function(seqs, decreasing, ...){
   # Make PFM
   pfm = makePFM(seqs, ...)
@@ -282,101 +282,93 @@ probability_method <- function(seqs, decreasing, ...){
 }
 
 
-
 #######################
-# Two sample logo
+# Two sample logo functions - method not used currently
 #######################
-t_test = function(a, b){
-  x = tryCatch({
-    return( t.test(a, b, var.equal = T)$p.value )
-  } , error=function(e) return(1) )
-  x
-}
-
-binom_test = function(a, b){
-  binom.test(sum(a), length(a), sum(b)/length(b))$p.value
-}
-
-
-# k1 = count pos; n1 = total pos
-# k2 = count neg; n2 = total neg
-ttest_p_value <- function(k1, n1, k2, n2)  {
-  mean1 = k1 / n1;
-  mean2 = k2 / n2;
-  
-  var1_mult = (k1*(1-mean1)*(1-mean1)) + ((n1-k1)*mean1*mean1);
-  var2_mult = (k2*(1-mean2)*(1-mean2)) + ((n2-k2)*mean2*mean2);
-  
-  df   = n1 + n2 - 2;
-  svar = (var1_mult + var2_mult) / df;
-  t    = (mean1-mean2) / sqrt(svar*(1.0/n1 + 1.0/n2));
-  return( 2*pt(t, df, lower=FALSE) )
-}
-
-
-to_matrix = function (x, seq){
-  X <- matrix(0, length(x), length(seq), dimnames = list(names(x), seq))
-  for (i in 1:length(seq)) X[x == seq[i], i] <- 1
-  return(X)
-}
-
-twosamplelogo_method <- function(fg, bg, fix_pos=NULL, test='t.test', pval_thresh=0.05, ...){
-  if(!is.character(fg) | !is.character(bg)) 
-    stop('Foreground and background sequences must be character vectors') 
-
-  if(!identical(unique(nchar(fg)), unique(nchar(bg)))) 
-    stop('Foreground sequences must have same width as background')
-
-  fg_obj = makePFM(fg, keep_letter_mat=T, ...)
-
-  namespace = attr(fg_obj$pfm, 'namespace')
-  seq_type = attr(fg_obj$pfm, 'seq_type')
-
-  # Pass sequence type and namespace - avoid double guessing
-  bg_obj = makePFM(bg, keep_letter_mat=T, seq_type = 'other', namespace = namespace)
-
-  # Difference in relative frequencies
-  pfm_diff = fg_obj$pfm - bg_obj$pfm 
-
-  # Get letter matrices
-  fg_lm = fg_obj$letter_mat
-  bg_lm = bg_obj$letter_mat
-
-  pv_mat = sapply(1:ncol(fg_lm), function(i){
-    p = to_matrix(fg_lm[,i], namespace)
-    n = to_matrix(bg_lm[,i], namespace)
-    
-    np = nrow(p)
-    nn = nrow(n)
-    
-    pv = sapply(1:ncol(p), function(j) binom_test(p[,j], n[,j]) )
-    #pv = sapply(1:ncol(p), function(j) ttest_p_value(sum(p[,j]), np, sum( n[,j] ), nn) )
-    names(pv) = names(p)
-    pv
-  })
-
-  
-  
-  # Set things below threshold to zero
-  pfm_diff[ pv_mat >= pval_thresh ] = 0
-  
-  pfm_diff = pfm_diff * 100
-  
-  #fix_pos = 13
-  if(!is.null(fix_pos)){
-    i = apply(fg_obj$pfm[,fix_pos,drop=F], 2, which.max)
-    ind = matrix(c(i, fix_pos), ncol=2)
-    x = pfm_diff
-    x[x < 0] = 0
-    pfm_diff[ind] = max( apply(x, 2, sum) )
-  }
-  
-  
-  
-  # Make heights
-  hh = matrix_to_heights(pfm_diff, seq_type)
-  hh
-}
+# t_test = function(a, b){
+#   x = tryCatch({
+#     return( t.test(a, b, var.equal = T)$p.value )
+#   } , error=function(e) return(1) )
+#   x
+# }
+# 
+# binom_test = function(a, b){
+#   binom.test(sum(a), length(a), sum(b)/length(b))$p.value
+# }
+# 
+# # ttest pvalue calculation reimplemented from TSL code 
+# ttest_p_value <- function(k1, n1, k2, n2)  {
+#   mean1 = k1 / n1;
+#   mean2 = k2 / n2;
+#   
+#   var1_mult = (k1*(1-mean1)*(1-mean1)) + ((n1-k1)*mean1*mean1);
+#   var2_mult = (k2*(1-mean2)*(1-mean2)) + ((n2-k2)*mean2*mean2);
+#   
+#   df   = n1 + n2 - 2;
+#   svar = (var1_mult + var2_mult) / df;
+#   t    = (mean1-mean2) / sqrt(svar*(1.0/n1 + 1.0/n2));
+#   return( 2*pt(t, df, lower=FALSE) )
+# }
+# 
+# # Convert to matrix of 1s and 0s
+# to_matrix = function (x, seq){
+#   X <- matrix(0, length(x), length(seq), dimnames = list(names(x), seq))
+#   for (i in 1:length(seq)) X[x == seq[i], i] <- 1
+#   return(X)
+# }
+# 
+# twosamplelogo_method <- function(fg, bg, fix_pos=NULL, test='t.test', pval_thresh=0.05, ...){
+#   if(!is.character(fg) | !is.character(bg)) 
+#     stop('Foreground and background sequences must be character vectors') 
+# 
+#   if(!identical(unique(nchar(fg)), unique(nchar(bg)))) 
+#     stop('Foreground sequences must have same width as background')
+# 
+#   fg_obj = makePFM(fg, keep_letter_mat=T, ...)
+# 
+#   namespace = attr(fg_obj$pfm, 'namespace')
+#   seq_type = attr(fg_obj$pfm, 'seq_type')
+# 
+#   # Pass sequence type and namespace - avoid double guessing
+#   bg_obj = makePFM(bg, keep_letter_mat=T, seq_type = 'other', namespace = namespace)
+# 
+#   # Difference in relative frequencies
+#   pfm_diff = fg_obj$pfm - bg_obj$pfm 
+# 
+#   # Get letter matrices
+#   fg_lm = fg_obj$letter_mat
+#   bg_lm = bg_obj$letter_mat
+# 
+#   pv_mat = sapply(1:ncol(fg_lm), function(i){
+#     p = to_matrix(fg_lm[,i], namespace)
+#     n = to_matrix(bg_lm[,i], namespace)
+#     
+#     np = nrow(p)
+#     nn = nrow(n)
+#     
+#     #pv = sapply(1:ncol(p), function(j) binom_test(p[,j], n[,j]) )
+#     pv = sapply(1:ncol(p), function(j) ttest_p_value(sum(p[,j]), np, sum( n[,j] ), nn) )
+#     names(pv) = names(p)
+#     pv
+#   })
+# 
+#   # Set things below threshold to zero
+#   pfm_diff[ pv_mat >= pval_thresh ] = 0
+#   pfm_diff = pfm_diff * 100
+#   
+#   #fix_pos = 1
+#   if(!is.null(fix_pos)){
+#     i = apply(fg_obj$pfm[,fix_pos,drop=F], 2, which.max)
+#     ind = matrix(c(i, fix_pos), ncol=2)
+#     x = pfm_diff
+#     x[x < 0] = 0
+#     pfm_diff[ind] = max( apply(x, 2, sum) )
+#   }
+#   
+#   # Make heights
+#   hh = matrix_to_heights(pfm_diff, seq_type)
+#   hh
+# }
 
 
 # plogo <- function(fg, bg, pval_thresh=0.05){

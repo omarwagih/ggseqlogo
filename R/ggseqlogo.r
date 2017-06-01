@@ -1,7 +1,7 @@
 # if(T){
 #   require(ggplot2)
 #   setwd('~/Development/ggseqlogo/')
-#   source('R/heights_new.r')
+#   source('R/heights.r')
 #   source('R/col_schemes.r')
 #   GGSEQLOGO_FONT_BASE = '~/Development/ggseqlogo/inst/fonts/'
 # }
@@ -16,50 +16,69 @@ newRange <- function(old_vals, new_min=0, new_max=1){
   new_vals
 }
 
+
+#' List fonts available in ggseqlogo
+#' 
+#' @param v If true, font names are printed to stderr. Otherwise, font names are returned as a character vector
+#' @export
+list_fonts <- function(v=T){
+  
+  fonts = c('helvetica_regular','helvetica_bold', 'helvetica_light',
+            'roboto_medium','roboto_bold', 'roboto_regular',
+            'akrobat_bold', 'akrobat_regular', 
+            'roboto_slab_bold', 'roboto_slab_regular', 'roboto_slab_light', 
+            'xkcd_regular')
+  if(!v) return(fonts)
+  message('Available ggseqlogo fonts:')
+  for(f in fonts) message('\t', f)
+}
+
+
 # Read font from file if not in global envir.
 get_font <- function(font){
   
-  if(exists('GGSEQLOGO_FONT_BASE', envir = .GlobalEnv)){
-    GGSEQLOGO_FONT_BASE = get('GGSEQLOGO_FONT_BASE', envir = .GlobalEnv)
-  }else{
-    GGSEQLOGO_FONT_BASE = system.file("fonts", "", package = "ggseqlogo")
+  GGSEQLOGO_FONT_BASE = getOption('GGSEQLOGO_FONT_BASE')
+  if(is.null(GGSEQLOGO_FONT_BASE)){
+    GGSEQLOGO_FONT_BASE=system.file("fonts", "", package = "ggseqlogo")
+    options(GGSEQLOGO_FONT_BASE=GGSEQLOGO_FONT_BASE)
   }
   
-  all_fonts = c('sf_bold', 'sf_regular')
-  font_filename = all_fonts[font]
-  if(is.na(font_filename)) stop('Invalid "font" value!')
-  font_filename = paste0(font_filename, '.rds')
+  #all_fonts = c('sf_bold', 'sf_regular', 'ms_bold', 'ms_regular', 'xkcd_regular')
+  font = match.arg(tolower(font), list_fonts(F))
+  font_filename = paste0(font, '.font')
   font_obj_name = sprintf('.ggseqlogo_font_%s', font)
   
-  if(!exists(font_obj_name, envir = .GlobalEnv)){
-    # Not loaded into global env yet - load it into global
+  font_obj = getOption(font_obj_name)
+  if(is.null(font_obj)){
+    # Not loaded into global env yet - load it into options
     font_path = file.path(GGSEQLOGO_FONT_BASE, font_filename)
-    assign(font_obj_name, readRDS(font_path), envir = .GlobalEnv)
+    font_obj_list = list( tmp=readRDS(font_path) )
+    names(font_obj_list) = font_obj_name
+    options(font_obj_list)
+    font_obj = font_obj_list[[1]]
   }
   
-  # Return font object
-  get(font_obj_name, envir = .GlobalEnv)
+  # Return font data
+  font_obj
 }
 
-
-validate_pfm <- function(pfm){
-  #apply(pfm, 1, )
-}
 
 # Generate height data for logo
-logo_data <- function( seqs, seqs_bg=NULL, method='bits', stack_width=0.95, 
-                       rev_stack_order=F, font=1, seq_group=1, 
+logo_data <- function( seqs, method='bits', stack_width=0.95, 
+                       rev_stack_order=F, font, seq_group=1, 
                        seq_type = 'auto', namespace=NULL ){
 
   # Get font 
-  sf_df = get_font(font)
+  font_df = get_font(font)
   
+  # TODO
+  # hh = twosamplelogo_method(seqs, seqs_bg, pval_thresh=0.05, seq_type = seq_type, namespace = namespace)
+  
+  # Generate heights based on method
   if(method == 'bits'){
     hh = bits_method(seqs, decreasing = rev_stack_order, seq_type = seq_type, namespace = namespace)
   }else if(method == 'probability'){
     hh = probability_method(seqs, decreasing = rev_stack_order, seq_type = seq_type, namespace = namespace)
-  }else if(method == 'tsl'){
-    hh = twosamplelogo_method(seqs, seqs_bg, pval_thresh=0.05, seq_type = seq_type, namespace = namespace)
   }else if(method == 'custom'){
     if(seq_type == 'auto') seq_type = guessSeqType(rownames(seqs))
     hh = matrix_to_heights(seqs, seq_type, decreasing = rev_stack_order)
@@ -67,17 +86,21 @@ logo_data <- function( seqs, seqs_bg=NULL, method='bits', stack_width=0.95,
     stop('Invalid method!')
   }
   
-  ff = merge(sf_df, hh, by = 'letter')
-  
-  # Scale x and ys
+  # Merge font df and heights
+  ff = merge(font_df, hh, by = 'letter')
+  # Scale x and ys to new positions
   x_pad = stack_width/2
-  ff$x = newRange(ff$x, ff$position-x_pad, ff$position + x_pad)
+  ff$x = newRange(ff$x, ff$position - x_pad, ff$position + x_pad)
   ff$y = newRange(ff$y, ff$y0, ff$y1)
   
+  # Rename columns
   ff = as.data.frame(ff)[,c('x', 'y', 'letter', 'position', 'order')]
   ff$seq_group = seq_group
   
+  # Set sequence type as attribute, to be used downstream
   attr(ff, 'seq_type') = attr(hh, 'seq_type')
+  
+  # Return data table
   ff
 }
 
@@ -87,12 +110,12 @@ logo_data <- function( seqs, seqs_bg=NULL, method='bits', stack_width=0.95,
 #' @param base_family font base family
 #' 
 #' @export
-theme_logo <- function(base_size=14, base_family=''){
-  theme_minimal(base_size = base_size, base_family = base_family) %+replace% 
-    theme(panel.grid = element_blank(), legend.position = 'bottom')
+theme_logo <- function(base_size=12, base_family=''){
+  ggplot2::theme_minimal(base_size = base_size, base_family = base_family) %+replace% 
+    theme(panel.grid = element_blank(), legend.position = 'bottom', 
+          axis.text.x=element_text(colour="black"),
+          axis.text.y=element_text(colour="black"))
 }
-
-
 
 #' Plots sequence logo as a layer on ggplot 
 #' 
@@ -101,11 +124,10 @@ theme_logo <- function(base_size=14, base_family=''){
 #' @param seq_type Sequence type, can be one of "auto", "aa", "dna", "rna" or "other" 
 #' (default: "auto", sequence type is automatically guessed)
 #' @param namespace Character vector of single letters to be used for custom namespaces
-#' @param font Integer specifying font
+#' @param font Name of font. See \code{list_fonts} for available fonts.
 #' @param stack_width Width of letter stack between 0 and 1 (default: 0.95)
 #' @param rev_stack_order If \code{TRUE}, order of letter stack is reversed (default: FALSE)
-#' @param col_scheme Color scheme applied to the sequence logo, can be one of the following: 
-#' "auto", "chemistry", "hydrophobicity", "nucleotide", "base_pairing", "clustalx", "taylor" 
+#' @param col_scheme Color scheme applied to the sequence logo. See \code{list_col_schemes} for available fonts.
 #' (default: "auto", color scheme is automatically picked based on \code{seq_type}). 
 #' One can also pass custom color scheme objects created with the \code{make_col_scheme} function
 #' @param low_col,high_col Colors for low and high ends of the gradient if a quantitative color scheme is used (default: "black" and "yellow").
@@ -115,8 +137,16 @@ theme_logo <- function(base_size=14, base_family=''){
 #' 
 #' @export
 #' @import ggplot2
-geom_logo <- function(data = NULL, seqs_bg = NULL, method='bits', seq_type='auto', namespace=NULL,
-                      font=1, stack_width=0.95, rev_stack_order=F, col_scheme = 'auto',
+#' 
+#' @examples
+#' # Load sample data
+#' data(ggseqlogo_sample)
+#' 
+#' # Produce single sequence logo using geom_logo
+#' p1 = ggplot() + geom_logo(seqs_dna[[1]]) + theme_logo()
+#' 
+geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NULL,
+                      font='roboto_medium', stack_width=0.95, rev_stack_order=F, col_scheme = 'auto',
                       low_col='black', high_col='yellow', na_col='grey20',
                       plot=T, ...) {
   
@@ -124,10 +154,10 @@ geom_logo <- function(data = NULL, seqs_bg = NULL, method='bits', seq_type='auto
   if(is.null(data)) stop('Missing "data" parameter!')
   
   # Validate method
-  all_methods = c('bits', 'probability', 'custom')#, 'tsl')
+  all_methods = c('bits', 'probability','custom')#, 'tsl')
   pind = pmatch(method, all_methods)
-  if(length(pind) != 1) stop("method must be one of 'bits' or 'probability', or 'custom'")
   method = all_methods[pind]
+  if(is.na(method)) stop("method must be one of 'bits' or 'probability', or 'custom'")
   
   # Convert character seqs to list
   if(is.character(data) | is.matrix(data)) data = list("1"=data)
@@ -141,7 +171,7 @@ geom_logo <- function(data = NULL, seqs_bg = NULL, method='bits', seq_type='auto
     # We have list of sequences - loop and rbind
     data_sp = lapply(names(data), function(n){
       curr_seqs = data[[n]]
-      logo_data(seqs = curr_seqs, seqs_bg = seqs_bg, method = method, stack_width = stack_width, 
+      logo_data(seqs = curr_seqs, method = method, stack_width = stack_width, 
                 rev_stack_order = rev_stack_order, seq_group = n, seq_type = seq_type, 
                 font = font, namespace=namespace)
     })
@@ -184,7 +214,6 @@ geom_logo <- function(data = NULL, seqs_bg = NULL, method='bits', seq_type='auto
   guides_opts = NULL
   if(identical(cs$letter, cs$group)) guides_opts = guides(fill=F)
   
-  assign('data', data, envir = .GlobalEnv)
   y_lim = NULL
   extra_opts = NULL
   if(method == 'tsl'){
@@ -204,8 +233,10 @@ geom_logo <- function(data = NULL, seqs_bg = NULL, method='bits', seq_type='auto
     substr(y_lab, 1, 1) = toupper(substr(y_lab, 1, 1))
   }
   
-  
+  # Group data
   data$group_by = with(data, interaction(seq_group, letter, position))
+  
+  data$x = data$x 
   # Create layer
   logo_layer = layer(
     stat = 'identity', data = data, 
@@ -215,17 +246,93 @@ geom_logo <- function(data = NULL, seqs_bg = NULL, method='bits', seq_type='auto
     params = list(na.rm = T, ...)
   ) 
   
- 
- 
   
   breaks_fun = function(lim){
-    x = 1: floor( lim[2]-(stack_width/2) )
+    # account for multiplicatuce expansion factor of 0.05
+    1: floor( lim[2] / 1.05 )
   }
   
-  
-  
+  # Expand 0.05 addidtive 
   list(logo_layer, scale_x_continuous(breaks = breaks_fun, labels = identity), 
-       ylab(y_lab), xlab(''), colscale_opts, guides_opts, coord_cartesian(ylim=y_lim), extra_opts)
+       ylab(y_lab), xlab(''), colscale_opts, guides_opts, coord_cartesian(ylim=y_lim), 
+       extra_opts)
 }
 
 
+#' Quick sequence logo plot
+#' 
+#' @description \code{ggseqlogo} is a shortcut for generating sequence logos. 
+#' It adds the ggseqlogo theme \code{\link{theme_logo}} by default, and facets when multiple input data are provided. 
+#' It serves as a convenient wrapper, so to customise logos beyond the defaults here, please use \code{\link{geom_logo}}.
+#' 
+#' @param data Character vector of sequences or named list of sequences. All sequences must have same width
+#' @param facet Facet type, can be 'wrap' or 'grid'
+#' @param scales Facet scales, see \code{\link{facet_wrap}}
+#' @param ncol Number of columns, works only when \code{facet='wrap'}, see \code{\link{facet_wrap}}
+#' @param nrow Number of rows, same as \code{ncol}
+#' @param ... Additional arguments passed to \code{\link{geom_logo}}
+#' 
+#' @export
+#' @examples
+#' # Load sample data
+#' data(ggseqlogo_sample)
+#' 
+#' # Plot a single DNA sequence logo
+#' p1 = ggseqlogo( seqs_dna[[1]] )
+#' print(p1)
+#' 
+#' # Plot multiple sequence logos at once
+#' p2 = ggseqlogo( seqs_dna )
+#' print(p2)
+ggseqlogo <- function(data, facet='wrap', scales='free_x', ncol=NULL, nrow=NULL, ...){
+  
+  # Generate the plot with default theme
+  p = ggplot() + geom_logo(data = data, ...) + theme_logo() 
+  
+  # If it's an inidivdual sequence logo, return plot
+  if(!'list' %in% class(data)) return(p)
+  
+  # If we have more than one plot, facet
+  facet_opts = c('grid', 'wrap')
+  pind = pmatch(facet, facet_opts)
+  facet = facet_opts[pind]
+  if(is.na(facet)) stop("facet option must be set to 'wrap' or 'grid'")
+  
+  if(facet == 'grid'){
+    p = p + facet_grid(~seq_group, scales = scales)
+  }else if(facet == 'wrap'){
+    p = p + facet_wrap(~seq_group, scales = scales, nrow = nrow, ncol = ncol)
+  }
+  
+  # Return plot
+  return(p)
+}
+
+
+#' List of aligned transcription factor binding sequences 
+#'
+#' @name seqs_dna
+#' @docType data
+#' @keywords data
+NULL
+
+#' List of aligned kinase-substrate binding sequences 
+#'
+#' @name seqs_aa
+#' @docType data
+#' @keywords data
+NULL
+
+#' List of position frequency matrices for transcription factors
+#'
+#' @name pfms_dna
+#' @docType data
+#' @keywords data
+NULL
+
+
+# message('-- running example')
+# load('data/ggseqlogo_sample.rda')
+# p = ggseqlogo(sample_data$seqs_dna, nrow=3)
+# d = p$layers[[1]]$data
+# print(p)

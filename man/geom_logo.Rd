@@ -4,8 +4,8 @@
 \alias{geom_logo}
 \title{Plots sequence logo as a layer on ggplot}
 \usage{
-geom_logo(data = NULL, seqs_bg = NULL, method = "bits",
-  seq_type = "auto", namespace = NULL, font = 1, stack_width = 0.95,
+geom_logo(data = NULL, method = "bits", seq_type = "auto",
+  namespace = NULL, font = "roboto_medium", stack_width = 0.95,
   rev_stack_order = F, col_scheme = "auto", low_col = "black",
   high_col = "yellow", na_col = "grey20", plot = T, ...)
 }
@@ -19,14 +19,13 @@ geom_logo(data = NULL, seqs_bg = NULL, method = "bits",
 
 \item{namespace}{Character vector of single letters to be used for custom namespaces}
 
-\item{font}{Integer specifying font}
+\item{font}{Name of font. See \code{list_fonts} for available fonts.}
 
 \item{stack_width}{Width of letter stack between 0 and 1 (default: 0.95)}
 
 \item{rev_stack_order}{If \code{TRUE}, order of letter stack is reversed (default: FALSE)}
 
-\item{col_scheme}{Color scheme applied to the sequence logo, can be one of the following: 
-"auto", "chemistry", "hydrophobicity", "nucleotide", "base_pairing", "clustalx", "taylor" 
+\item{col_scheme}{Color scheme applied to the sequence logo. See \code{list_col_schemes} for available fonts.
 (default: "auto", color scheme is automatically picked based on \code{seq_type}). 
 One can also pass custom color scheme objects created with the \code{make_col_scheme} function}
 
@@ -41,4 +40,11 @@ One can also pass custom color scheme objects created with the \code{make_col_sc
 \description{
 Plots sequence logo as a layer on ggplot
 }
+\examples{
+# Load sample data
+data(ggseqlogo_sample)
 
+# Produce single sequence logo using geom_logo
+p1 = ggplot() + geom_logo(seqs_dna[[1]]) + theme_logo()
+
+}

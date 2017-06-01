@@ -1,116 +1,41 @@
 <img src="https://cdn.rawgit.com/omarwagih/ggseqlogo/4938177a/inst/images/logo.svg" alt="ggseqlogo logo" width="350px"><br>
 
-
-## Installation
-Install ggseqlogo using the `devtools` package:
-
-```r
-library("devtools")
-install_github("omarwagih/ggseqlogo")
-```
-
+ggseqlogo is an R package for generating publication-ready sequence logos using ggplot2. 
 
 ## Getting started
+First install `ggseqlogo` from github using the `devtools` package:
+
 ```r
+devtools::install_github("omarwagih/ggseqlogo")
+```
+
+Load up the package and sample data
+
+```r
+# Load the required packages
 require(ggplot2)
 require(ggseqlogo)
 
-# Some example DNA sequences
-f = system.file("extdata", "sample_dna.rds", package = "ggseqlogo")
-seqs_list = readRDS(f)
+# Some sample data
+data(ggseqlogo_sample)
 
-# Get first set of sequences
-seqs_dna = seqs_list[[1]]
-
-# Plot a sequence logo
-ggplot() + geom_logo(seqs_dna) + theme_logo()
 ```
 
-<img src="inst/images/fig1.png" width="450px"><br>
-
-## Color schemes
-ggseqlogo has preset color schemes that can be set using the `col_scheme` parameter. By default, the `col_scheme` is set to `auto` such that the color scheme is automatically chosen based on your sequence type. 
-
-You can adjust the parameter.
-For amino acids you can pick from the following `chemistry`, `hydrophobicity`, `clustalx`, `taylor`. For DNA and RNA sequences `nucleotide` and `base_pairing`. For example:
+Then draw a sequence logo
 
 ```r
-ggplot() + geom_logo(seqs_dna, col_scheme='base_pairing') + theme_logo()
+# Plot DNA sequence logo
+ggseqlogo( seqs_dna$sample_dna_1 )
+
+# Plot protein sequence logo
+ggseqlogo( seqs_aa$sample_aa_1 )
 ```
 
-<img src="inst/images/fig2.png" width="450px"><br>
-
-### Custom color schemes
-If the presets are not enough for you, you can define custom discrete or continuous color schemes using the `make_col_scheme` function. 
-
-#### Discrete color schemes:
-
-```
-cs1 = make_col_scheme(chars=c('A', 'T', 'C', 'G'), groups=c('gr1', 'gr1', 'gr2', 'gr2'), 
-					  cols=c('purple', 'purple', 'blue', 'blue'))
-
-ggplot() + geom_logo(seqs_dna, col_scheme=cs1) + theme_logo()
-```
-
-Note that the `groups` parameter here is optional
+For more examples, and a list of features **[see the full tutorial here](http://omarwagih.github.io/ggseqlogo/)**.
 
 
-<img src="inst/images/fig3.png" width="450px"><br>
-
-#### Continuous color schemes:
-
-```
-cs2 = make_col_scheme(chars=c('A', 'T', 'C', 'G'), values=1:4)
-
-ggplot() + geom_logo(seqs_dna, col_scheme=cs2) + theme_logo()
-```
-
-
-<img src="inst/images/fig4.png" width="450px"><br>
-
-
-## Facets
-You can plot more than one sequence logo with the help of facets. `geom_logo` will accept a named list of sequences
-
-```r			   
-ggplot() + geom_logo(seqs_list) + theme_logo() + 
-  facet_wrap(~seq_group, ncol=1, scales='free_x') 
-```
-
-
-<img src="inst/images/fig5.png" width="450px"><br>
-
-
-## Sequence types
-Amino acids, DNA and RNA sequence types are all supported. If however you want to define a custom alphabet you can do so by setting `seq_type` to "other" and set `namespace`. For example, lets say you want a sequence logo of zeros and ones:
-
-```r
-seqs_other = c('10010', '10100', '01010', '01001')
-ggplot() + 
-	geom_logo(seqs_other, method='p', seq_type='other', namespace=0:1) + 
-	theme_logo()
-```
-
-<img src="inst/images/fig6.png" width="450px"><br>
-
-## Fonts
-Currently two fonts are available, with more added soon.
-
-1. San Francisco bold
-2. San Francisco regular
-
-You can adjust the font by setting the `font` parameter:
-
-```r
-ggplot() + geom_logo(seqs_dna, font=2) + theme_logo()
-``` 
-
-
-<img src="inst/images/fig7.png" width="450px"><br>
-
-## Documentation
-For more details on all features and parameters see `?geom_logo` and `?make_col_scheme`
-
+## Tutorial
+A detailed tutorial on how to use ggseqlogo **[can be found here](http://omarwagih.github.io/ggseqlogo/)**.
 
 ## Feedback
-If you have any feedback or suggestions, please drop me a line at (omarwagih(at)gmail.com) or open an issue on github.
+If you have any feedback or suggestions, drop me a line at (omarwagih(at)gmail.com) or open an issue on github.

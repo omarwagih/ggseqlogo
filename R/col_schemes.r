@@ -1,4 +1,17 @@
 
+#' List color schemes available in ggseqlogo
+#' 
+#' @param v If true, font names are printed to stderr. Otherwise, color scheme names are returned as a character vector
+#' @export
+list_col_schemes <- function(v=T){
+  
+  col_schemes = c('auto', 'chemistry', 'chemistry2','hydrophobicity', 'nucleotide', 'nucleotide2',
+             'base_pairing', 'clustalx', 'taylor')
+  if(!v) return(col_schemes)
+  message('Available ggseqlogo color schemes:')
+  for(f in col_schemes) message('\t', f)
+}
+
 
 # Get color scheme
 # @param col_scheme name of color scheme
@@ -11,18 +24,9 @@ get_col_scheme = function(col_scheme, seq_type='auto'){
       stop('Colour scheme must be generated using "make_col_scheme" function')
     return(col_scheme)
   }
-  
-  # Get preset 
-  all_cs = c('auto', 'chemistry', 'hydrophobicity', 'nucleotide', 
-             'base_pairing', 'clustalx', 'taylor')
-  
-  ind = pmatch(col_scheme, all_cs)
-  if(is.na(ind))
-    stop(paste('Invalid colour scheme - must be one of:', paste0(all_cs, collapse = ', ')))
-  
+ 
   # Get ambigious colour scheme
-  col_scheme = all_cs[ind]
-  
+  col_scheme = match.arg(col_scheme, list_col_schemes(F))
   
   # Get default color scheme for sequence type
   if(col_scheme == 'auto'){
@@ -38,10 +42,18 @@ get_col_scheme = function(col_scheme, seq_type='auto'){
   # Pick from default color schemes
   cs = switch(col_scheme, 
          # Color scheme based on chemistry of amino acids
-         chemistry = data.frame(
+         chemistry2 = data.frame(
            letter = c('G', 'S', 'T', 'Y', 'C', 'N', 'Q', 'K', 'R', 'H', 'D', 'E', 'P', 'A', 'W', 'F', 'L', 'I', 'M', 'V'),
            group = c(rep('Polar', 5), rep('Neutral', 2), rep('Basic', 3), rep('Acidic', 2), rep('Hydrophobic', 8)),
            col = c(rep('#058644', 5), rep('#720091', 2), rep('#0046C5', 3), rep('#C5003E', 2), rep('#2E2E2E', 8)),
+           stringsAsFactors = F
+         ), 
+         
+         # Color scheme based on chemistry of amino acids
+         chemistry = data.frame(
+           letter = c('G', 'S', 'T', 'Y', 'C', 'N', 'Q', 'K', 'R', 'H', 'D', 'E', 'P', 'A', 'W', 'F', 'L', 'I', 'M', 'V'),
+           group = c(rep('Polar', 5), rep('Neutral', 2), rep('Basic', 3), rep('Acidic', 2), rep('Hydrophobic', 8)),
+           col = c(rep('#109648', 5), rep('#5E239D', 2), rep('#255C99', 3), rep('#D62839', 2), rep('#221E22', 8)),
            stringsAsFactors = F
          ), 
          
@@ -55,9 +67,16 @@ get_col_scheme = function(col_scheme, seq_type='auto'){
          ), 
          
          # Colour based on nucleotide
-         nucleotide = data.frame(
+         nucleotide2 = data.frame(
            letter = c('A', 'C', 'G', 'T', 'U'),
            col = c('darkgreen', 'blue', 'orange', 'red', 'red'),
+           stringsAsFactors = F
+         ), 
+         
+         #alt red BA1200
+         nucleotide = data.frame(
+           letter = c('A', 'C', 'G', 'T', 'U'),
+           col = c('#109648', '#255C99', '#F7B32B', '#D62839', '#D62839'),
            stringsAsFactors = F
          ), 
          

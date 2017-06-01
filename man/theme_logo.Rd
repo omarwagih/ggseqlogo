@@ -4,7 +4,7 @@
 \alias{theme_logo}
 \title{ggseqlogo custom theme}
 \usage{
-theme_logo(base_size = 14, base_family = "")
+theme_logo(base_size = 12, base_family = "")
 }
 \arguments{
 \item{base_size}{font base size}
@@ -14,4 +14,3 @@ theme_logo(base_size = 14, base_family = "")
 \description{
 ggseqlogo custom theme
 }
-
