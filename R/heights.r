@@ -203,7 +203,9 @@ makePFM <- function(seqs, seq_type='auto', namespace=NULL, keep_letter_mat=F){
 matrix_to_heights <- function(mat, seq_type, decreasing=T){
   
   mat[is.infinite(mat)] = 0 
-
+  
+  if(any(duplicated(rownames(mat)))) stop('Matrix input must have unique row names')
+  
   dat = lapply(1:ncol(mat), function(i){
     vals = mat[,i]
     
