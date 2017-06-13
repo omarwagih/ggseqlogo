@@ -45,6 +45,6 @@ Plots sequence logo as a layer on ggplot
 data(ggseqlogo_sample)
 
 # Produce single sequence logo using geom_logo
-p1 = ggplot() + geom_logo(seqs_dna[[1]]) + theme_logo()
+p1 = ggseqlogo( seqs_dna[[1]] ) 
 
 }

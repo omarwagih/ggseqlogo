@@ -39,7 +39,7 @@ get_font <- function(font){
   
   GGSEQLOGO_FONT_BASE = getOption('GGSEQLOGO_FONT_BASE')
   if(is.null(GGSEQLOGO_FONT_BASE)){
-    GGSEQLOGO_FONT_BASE=system.file("fonts", "", package = "ggseqlogo")
+    GGSEQLOGO_FONT_BASE=system.file("extdata", "", package = "ggseqlogo")
     options(GGSEQLOGO_FONT_BASE=GGSEQLOGO_FONT_BASE)
   }
   
@@ -109,6 +109,7 @@ logo_data <- function( seqs, method='bits', stack_width=0.95,
 #' @param base_size font base size
 #' @param base_family font base family
 #' 
+#' @import ggplot2
 #' @export
 theme_logo <- function(base_size=12, base_family=''){
   ggplot2::theme_minimal(base_size = base_size, base_family = base_family) %+replace% 
@@ -143,7 +144,7 @@ theme_logo <- function(base_size=12, base_family=''){
 #' data(ggseqlogo_sample)
 #' 
 #' # Produce single sequence logo using geom_logo
-#' p1 = ggplot() + geom_logo(seqs_dna[[1]]) + theme_logo()
+#' p1 = ggseqlogo( seqs_dna[[1]] ) 
 #' 
 geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NULL,
                       font='roboto_medium', stack_width=0.95, rev_stack_order=F, col_scheme = 'auto',

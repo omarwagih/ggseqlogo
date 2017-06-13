@@ -2,7 +2,7 @@ inst/images/.*$
 ^\.travis\.yml$
 ggseqlogo.Rcheck/.*$
 ggseqlogo_.*\.tar\.gz$
-build/.*$
+dist/.*$
 docs/.*$
 inst/fonts/.*$
 README.md

@@ -1,11 +1,14 @@
 Package: ggseqlogo
 Type: Package
-Title: Beautiful and Versatile Sequence Logos
+Title: A 'ggplot2' Extension for Drawing Publication-Ready Sequence Logos
 Version: 0.0.1
-Date: 2017-02-18
+Date: 2017-06-12
 Author: Omar Wagih
 Maintainer: Omar Wagih <wagih@ebi.ac.uk>
-Description: A ggplot2 extension that allows for plotting of publication-ready sequence logos and integration of logos with other plots.
+Description: The extensive range of functions provided by this package makes it possible to draw highly versatile sequence logos. Features include, but not limited to, modifying colour schemes and fonts used to draw the logo, generating multiple logo plots, and aiding the visualisation with annotations. Sequence logos can easily be combined with other plots 'ggplot2' plots.
 License: LGPL
 Imports: ggplot2
 RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
