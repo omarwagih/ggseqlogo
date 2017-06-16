@@ -1,4 +1,6 @@
 <img src="https://cdn.rawgit.com/omarwagih/ggseqlogo/4938177a/inst/images/logo.svg" alt="ggseqlogo logo" width="350px"><br>
+[![](http://cranlogs.r-pkg.org/badges/ggseqlogo)](http://cran.rstudio.com/web/packages/ggseqlogo/index.html)
+	
 
 ggseqlogo is an R package for generating publication-ready sequence logos using ggplot2. 
 
