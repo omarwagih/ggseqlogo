@@ -64,7 +64,7 @@ devtools::install_github("omarwagih/ggseqlogo")
 
 
 ## Load sample data
-To get started, fire up the packages and load some sample data 
+To get started, fire up the packages and load some sample data.
 
 ```{r, eval=T, echo=T, warning=F, message=F}
 # Load the required packages
@@ -77,22 +77,22 @@ data(ggseqlogo_sample)
 
 This loads three sample data sets:
 
-- `seqs_dna`: a list of sequences for transcription factor binding sites
-- `seqs_aa`: a list of sequences for kinase-substrate binding data
-- `pfms_dna`: a list of position frequency matrices for transcription factors
+- `seqs_dna`: sets of binding sites for 12 transcription factors obtained from FASTA files in [JASPAR](http://jaspar.genereg.net/). This is represented as a named list of character vectors, where the names represent the JASPAR ID.
+- `pfms_dna`: a list of position frequency matrices for four transcription factors obtained from [JASPAR](http://jaspar.genereg.net/). This is represented as a list of matrices, where the names represent the JASPAR ID.
+- `seqs_aa`: sets of kinase-substrate phosphorylation sites obtained from [Wagih et al.](https://www.ncbi.nlm.nih.gov/pubmed/25938373) This is represented as a named list of character vectors where the names represent the names of the kinases associated with the phosphosites.
 
 ## Plot a sequence logo 
 
-You can draw a sequence logos using `ggplot` function, with `geom_logo`. Let's try this on sequences for one of the transcription factors:
+You can draw a sequence logos using `ggplot` function, with `geom_logo`. Let's try this on sequences for one of the transcription factors from JASPAR:
 
 ```{r simple_slow, eval=F, fig.cap='Using the original geom_logo method to generate a simple sequence logo'}
-ggplot() + geom_logo( seqs_dna$sample_dna_1 ) + theme_logo()
+ggplot() + geom_logo( seqs_dna$MA0001.1 ) + theme_logo()
 ```
 
 You can also use the `ggseqlogo` as a shortcut to do the same thing. This is a wrapper function which adds `theme_logo` by default and performs any required faceting if multiple sequences logos are to be drawn. This is the function used throughout this tutorial.
 
 ```{r simple_quick, fig.cap='Using the ggseqlogo wrapper function as a shortcut'}
-ggseqlogo( seqs_dna$sample_dna_1 )
+ggseqlogo( seqs_dna$MA0001.1 )
 ```
 
 
@@ -106,7 +106,7 @@ ggseqlogo accepts three types of input, each described in detail below
 The following generates a sequence logo using a position frequency matrix from the sample data
 
 ```{r pfm_input, fig.cap='Creating sequence logos using position frequency matrices'}
-ggseqlogo( pfms_dna$sample_pfm_1 )
+ggseqlogo( pfms_dna$MA0018.2 )
 ```
   
 # Plotting methods
@@ -114,8 +114,8 @@ ggseqlogo( pfms_dna$sample_pfm_1 )
 ggseqlogo supports two sequence logo methods through the `method` options: 'bits' and 'probability'. By default, the bits is used. 
 
 ```{r plot_method, fig.cap='Using different methods to plot a sequence logo'}
-p1 = ggseqlogo( seqs_dna$sample_dna_1, method = 'bits' )
-p2 = ggseqlogo( seqs_dna$sample_dna_1, method = 'prob' )
+p1 = ggseqlogo( seqs_dna$MA0001.1, method = 'bits' )
+p2 = ggseqlogo( seqs_dna$MA0001.1, method = 'prob' )
 gridExtra::grid.arrange(p1, p2)
 ```
 
@@ -125,20 +125,30 @@ gridExtra::grid.arrange(p1, p2)
 ## Preset alphabets
 Amino acids, DNA and RNA sequence types are all supported by ggseqlogo. By default, ggseqlogo will try to guess your sequence type. You can explicitly set the sequence type through the `seq_type` option. 
 
-Lets try generate an amino acid sequence logo:
+Lets try generate an amino acid sequence logo using kinase-substrate phosphorylation data:
 
 ```{r aa_example, fig.cap='An example sequence logo for amino acids'}
-ggseqlogo( seqs_aa$sample_aa_1, seq_type='aa' )
+ggseqlogo( seqs_aa$AKT1, seq_type='aa' )
 ```
 
 ## Custom alphabet
-If you want to define a custom alphabet you can do so by setting `seq_type` to "other" and set `namespace` with your desired custom alphabet. For example, lets say you wanted a sequence logo of zeros and ones:
+If you want to define a custom alphabet you can do so by setting `namespace` with your desired custom alphabet. For example, lets say you wanted a sequence logo of zeros and ones:
 
-```{r custom_namespace, fig.width=6, fig.height=4, fig.cap='Generating sequence logos with custom dictionaries'}
-seqs_other = c('10010', '10100', '01010', '01001')
-ggseqlogo(seqs_other, method='p', seq_type='other', namespace=0:1) 
+```{r custom_namespace, fig.width=6, fig.height=4, fig.cap='Generating sequence logos with custom dictionaries - numerical characters'}
+# Replace DNA characters with numbers
+seqs_numeric = chartr('ATGC','1234', seqs_dna$MA0001.1)
+ggseqlogo(seqs_numeric, method='p', namespace=1:4) 
 ```
 
+Greek letters are also supported:
+```{r custom_namespace_greek, fig.width=6, fig.height=4, fig.cap='Generating sequence logos with custom dictionaries - Greek characters'}
+# Replace DNA characters with Greek ones
+seqs_greek = chartr('ATGC', 'δεψλ', seqs_dna$MA0001.1)
+ggseqlogo(seqs_greek, namespace='δεψλ', method='p')
+```
+
+
+For colors, you will need to create a custom color scheme for your namespace. 
 
 # Colour schemes
 
@@ -149,7 +159,7 @@ You can adjust the parameter.
 For amino acids you can pick from the following `chemistry`, `hydrophobicity`, `clustalx`, `taylor`. For DNA and RNA sequences `nucleotide` and `base_pairing`. For a full list of color schemes, see the `list_col_schemes` function. For example:
 
 ```{r preset_col_scheme, fig.cap='An example of using a preset colour scheme'}
-ggseqlogo(seqs_dna$sample_dna_1, col_scheme='base_pairing')
+ggseqlogo(seqs_dna$MA0001.1, col_scheme='base_pairing')
 ```
 
 
@@ -164,7 +174,7 @@ cs1 = make_col_scheme(chars=c('A', 'T', 'C', 'G'), groups=c('gr1', 'gr1', 'gr2',
                       cols=c('purple', 'purple', 'blue', 'blue'))
 
 # Generate sequence logo
-ggseqlogo(seqs_dna$sample_dna_1, col_scheme=cs1)
+ggseqlogo(seqs_dna$MA0001.1, col_scheme=cs1)
 ```
 
 Note that the `groups` parameter here is optional
@@ -176,7 +186,7 @@ Note that the `groups` parameter here is optional
 cs2 = make_col_scheme(chars=c('A', 'T', 'C', 'G'), values=1:4)
 
 # Generate sequence logo
-ggseqlogo(seqs_dna$sample_dna_1, col_scheme=cs2)
+ggseqlogo(seqs_dna$MA0001.1, col_scheme=cs2)
 ```
 
 
@@ -220,7 +230,7 @@ To list all the available color schemes use the `list_fonts` function.
 fonts = list_fonts(F)
 
 p_list = lapply(fonts, function(f){
-  ggseqlogo(seqs_dna$sample_dna_1, font=f) + ggtitle(f)
+  ggseqlogo(seqs_dna$MA0001.1, font=f) + ggtitle(f)
 })
 
 do.call(gridExtra::grid.arrange, c(p_list, ncol=2))
@@ -234,10 +244,10 @@ Overlaying annotation onto sequence logos is straightforward in ggseqlogo with g
 
 ```{r annot_logos, fig.cap='Annotating sequence logos'}
 ggplot() + 
-  annotate('rect', xmin = 4.5, xmax = 12.5, ymin = -0.05, ymax = 1.9, alpha = .1, col='black', fill='yellow') +
-  geom_logo(seqs_dna$sample_dna_4, stack_width = 0.90) + 
-  annotate('segment', x = 21, xend=24, y=1, yend=1, size=2) + 
-  annotate('text', x=23, y=1.2, label='Text annotation') + 
+  annotate('rect', xmin = 0.5, xmax = 3.5, ymin = -0.05, ymax = 1.9, alpha = .1, col='black', fill='yellow') +
+  geom_logo(seqs_dna$MA0001.1, stack_width = 0.90) + 
+  annotate('segment', x = 4, xend=8, y=1.2, yend=1.2, size=2) + 
+  annotate('text', x=6, y=1.3, label='Text annotation') + 
   theme_logo()
 ```
 
@@ -250,7 +260,7 @@ Combining sequence logos with other plots generated by ggplot2 is simple. I'll d
 
 ```{r comb_logos, fig.cap='Combining sequence logos with other ggplot2 plots', fig.width=3, fig.height = 5,messages=FALSE}
 # Sequences we're going to use for the logo
-seqs = seqs_dna$sample_dna_2
+seqs = seqs_dna$MA0008.1
 
 # Generate the sequence logo
 p1 = ggseqlogo(seqs) + theme(axis.text.x = element_blank())

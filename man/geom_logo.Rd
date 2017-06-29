@@ -17,7 +17,7 @@ geom_logo(data = NULL, method = "bits", seq_type = "auto",
 \item{seq_type}{Sequence type, can be one of "auto", "aa", "dna", "rna" or "other" 
 (default: "auto", sequence type is automatically guessed)}
 
-\item{namespace}{Character vector of single letters to be used for custom namespaces}
+\item{namespace}{Character vector of single letters to be used for custom namespaces. Can be alphanumeric, including Greek characters.}
 
 \item{font}{Name of font. See \code{list_fonts} for available fonts.}
 

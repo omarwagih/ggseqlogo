@@ -124,7 +124,7 @@ theme_logo <- function(base_size=12, base_family=''){
 #' @param method Height method, can be one of "bits" or "probability" (default: "bits")
 #' @param seq_type Sequence type, can be one of "auto", "aa", "dna", "rna" or "other" 
 #' (default: "auto", sequence type is automatically guessed)
-#' @param namespace Character vector of single letters to be used for custom namespaces
+#' @param namespace Character vector of single letters to be used for custom namespaces. Can be alphanumeric, including Greek characters.
 #' @param font Name of font. See \code{list_fonts} for available fonts.
 #' @param stack_width Width of letter stack between 0 and 1 (default: 0.95)
 #' @param rev_stack_order If \code{TRUE}, order of letter stack is reversed (default: FALSE)
@@ -153,6 +153,7 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
   
   if(stack_width > 1 | stack_width <= 0) stop('"stack_width" must be between 0 and 1')
   if(is.null(data)) stop('Missing "data" parameter!')
+  if(!is.null(namespace)) seq_type = 'other'
   
   # Validate method
   all_methods = c('bits', 'probability','custom')#, 'tsl')

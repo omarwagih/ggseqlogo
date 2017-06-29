@@ -90,9 +90,11 @@ img2poly <- function(letter, fontfamily, fontface=1, do_thin=T, extra_thins=c(),
 
 
 makePolyFont <- function(fontfamily, fontface=2, I_fontfamily=fontfamily, is_bold=F, 
-                         cores=1, X=3000, extra_thins=c(), thin_factor=0.22){
+                         cores=1, X=3000, extra_thins=c(), thin_factor=0.22, do_greek=F){
   
+  greek='αβΓγΔδεζηΘθικΛλμΞξΠπρστυΦφχΨψΩω'
   chars = c(0:9, letters, LETTERS)
+  if(do_greek) chars = c(chars, strsplit(greek, '')[[1]])
   #chars = 'Q'
   dat = mclapply(X=chars, mc.cores=cores, FUN=function(ch){
     ff = ifelse(ch == "I", I_fontfamily, fontfamily)
@@ -119,20 +121,6 @@ setwd('~/Development/ggseqlogo/inst/fonts/')
 # }
 
 
-#______ Roboto: sansserif ______
-if(F){
-  # Bold
-  roboto_bold = makePolyFont(fontfamily = 'Roboto-Bold', I_fontfamily = 'Menlo-Bold', cores=3)
-  saveRDS(roboto_bold, 'roboto_bold.font')
-  
-  # Bold
-  roboto_regular = makePolyFont(fontfamily = 'Roboto-Regular', I_fontfamily = 'Menlo-Regular', cores=3)
-  saveRDS(roboto_regular, 'roboto_regular.font')
-  
-  # Medium
-  roboto_medium = makePolyFont(fontfamily = 'Roboto-Medium', I_fontfamily = 'Menlo-Bold', cores=3)
-  saveRDS(roboto_medium, 'roboto_medium.font')
-}
 
 
 #______ Akrobat: sansserif ______
@@ -151,15 +139,15 @@ if(F){
 #______ Roboto slab: serif ______
 if(F){
   # Bold
-  roboto_slab_bold = makePolyFont(fontfamily = 'RobotoSlab-Bold', cores=3)
+  roboto_slab_bold = makePolyFont(fontfamily = 'RobotoSlab-Bold',  do_greek = T, cores=2)
   saveRDS(roboto_slab_bold, 'roboto_slab_bold.font')
   
   # Regular
-  roboto_slab_regular = makePolyFont(fontfamily = 'RobotoSlab-Regular', cores=3)
+  roboto_slab_regular = makePolyFont(fontfamily = 'RobotoSlab-Regular', do_greek = T, cores=2)
   saveRDS(roboto_slab_bold, 'roboto_slab_regular.font')
   
   # Light
-  roboto_slab_light = makePolyFont(fontfamily = 'RobotoSlab-Light', cores=3)
+  roboto_slab_light = makePolyFont(fontfamily = 'RobotoSlab-Light',  do_greek = T, cores=2)
   saveRDS(roboto_slab_light, 'roboto_slab_light.font')
 }
 
@@ -174,17 +162,34 @@ if(F){
 
 
 
-#______ Helvetica: sansserif ______
+#______ Roboto: sansserif ______
 if(T){
   # Bold
-  # helvetica_bold = makePolyFont(fontfamily = 'Helvetica-Bold', I_fontfamily = 'Menlo-Bold', cores=6)
-  # saveRDS(helvetica_bold, 'helvetica_bold.font')
+  roboto_bold = makePolyFont(fontfamily = 'Roboto-Bold', I_fontfamily = 'Menlo-Bold',  do_greek = T, cores=2)
+  saveRDS(roboto_bold, 'roboto_bold.font')
   
   # Regular
-  helvetica_regular = makePolyFont(fontfamily = 'Helvetica', I_fontfamily = 'Menlo-Regular', cores=6)
+  roboto_regular = makePolyFont(fontfamily = 'Roboto-Regular', I_fontfamily = 'Menlo-Regular', do_greek = T, cores=2)
+  saveRDS(roboto_regular, 'roboto_regular.font')
+  
+  # Medium
+  roboto_medium = makePolyFont(fontfamily = 'Roboto-Medium', I_fontfamily = 'Menlo-Bold', do_greek = T, cores=2)
+  saveRDS(roboto_medium, 'roboto_medium.font')
+  
+}
+
+
+#______ Helvetica: sansserif ______
+if(T){
+  #Bold
+  helvetica_bold = makePolyFont(fontfamily = 'Helvetica-Bold', I_fontfamily = 'Menlo-Bold',  do_greek = T, cores=2)
+  saveRDS(helvetica_bold, 'helvetica_bold.font')
+  
+  # Regular
+  helvetica_regular = makePolyFont(fontfamily = 'Helvetica', I_fontfamily = 'Menlo-Regular',  do_greek = T, cores=2)
   saveRDS(helvetica_regular, 'helvetica_regular.font')
   
   # Light
-  helvetica_light = makePolyFont(fontfamily = 'Helvetica-Light', I_fontfamily = 'Menlo-Regular', cores=6)
+  helvetica_light = makePolyFont(fontfamily = 'Helvetica-Light', I_fontfamily = 'Menlo-Regular',  do_greek = T, cores=2)
   saveRDS(helvetica_light, 'helvetica_light.font')
 }

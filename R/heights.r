@@ -56,7 +56,7 @@ findNamespace <- function(letter_mat, seq_type, namespace){
     namespace = unique( unlist(strsplit(namespace, '')) )
     
     # Validate
-    non_alphanumeric = grepl("[^[:alnum:] ]", namespace)
+    non_alphanumeric = grepl('[^a-zA-Z0-9αβΓγΔδεζηΘθικΛλμΞξΠπρστυΦφχΨψΩω]', namespace)
     if( any( non_alphanumeric ) )
       stop('All letters in the namespace must be alphanumeric')
     
