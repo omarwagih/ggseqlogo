@@ -27,11 +27,11 @@ data(ggseqlogo_sample)
 Then draw a sequence logo
 
 ```r
-# Plot DNA sequence logo
-ggseqlogo( seqs_dna$sample_dna_1 )
+# Plot DNA sequence logo for transcription factor - data from JASPAR
+ggseqlogo( seqs_dna$MA0001.1 )
 
-# Plot protein sequence logo
-ggseqlogo( seqs_aa$sample_aa_1 )
+# Plot protein sequence logo for kinase target phosphosites
+ggseqlogo( seqs_aa$AKT1 )
 ```
 
 For more examples, and a list of features **[see the full tutorial here](http://omarwagih.github.io/ggseqlogo/)**.
