@@ -47,6 +47,13 @@ vignette: >
 knitr::opts_chunk$set(comment=NA, fig.height=3, fig.width=7, fig.align='center', dev='png', dpi=72)
 ```
 
+# Citation
+If you use ggseqlogo please cite:
+
+Wagih, Omar. ggseqlogo: a versatile R package for drawing sequence logos. _Bioinformatics_ (2017).
+[https://doi.org/10.1093/bioinformatics/btx469](https://doi.org/10.1093/bioinformatics/btx469)
+
+
 # Installation
 First, install `ggseqlogo` from CRAN 
 
