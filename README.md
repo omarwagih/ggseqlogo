@@ -44,7 +44,7 @@ A detailed tutorial on how to use ggseqlogo **[can be found here](http://omarwag
 If you use ggseqlogo, please cite:
 
 Wagih, Omar. ggseqlogo: a versatile R package for drawing sequence logos. _Bioinformatics_ (2017).
-[https://doi.org/10.1093/bioinformatics/btx469](https://doi.org/10.1093/bioinformatics/btx469)
+[https://doi.org/10.1093/bioinformatics/btx469](https://doi.org/10.1093/bioinformatics/btx469) PMID: [29036507](https://www.ncbi.nlm.nih.gov/pubmed/29036507)
 
 ## Feedback
 If you have any feedback or suggestions, drop me a line at (omarwagih(at)gmail.com) or open an issue on github.

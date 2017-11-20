@@ -6,3 +6,4 @@ dist/.*$
 docs/.*$
 inst/fonts/.*$
 README.md
+shiny/.*$
