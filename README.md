@@ -43,7 +43,7 @@ A detailed tutorial on how to use ggseqlogo **[can be found here](http://omarwag
 ## Citation
 If you use ggseqlogo, please cite:
 
-Wagih, Omar. ggseqlogo: a versatile R package for drawing sequence logos. _Bioinformatics_ (2017).
+Wagih, Omar. ggseqlogo: a versatile R package for drawing sequence logos. _Bioinformatics_ 33, no. 22 (2017): 3645-3647.
 [https://doi.org/10.1093/bioinformatics/btx469](https://doi.org/10.1093/bioinformatics/btx469) PMID: [29036507](https://www.ncbi.nlm.nih.gov/pubmed/29036507)
 
 ## Feedback
