@@ -66,13 +66,13 @@ get_font <- function(font){
 # Generate height data for logo
 logo_data <- function( seqs, method='bits', stack_width=0.95, 
                        rev_stack_order=F, font, seq_group=1, 
-                       seq_type = 'auto', namespace=NULL ){
+                       seq_type = 'auto', namespace=NULL, seqs_bg=NULL, pval_thresh=0.05, test='t.test' ){
 
   # Get font 
   font_df = get_font(font)
   
   # TODO
-  # hh = twosamplelogo_method(seqs, seqs_bg, pval_thresh=0.05, seq_type = seq_type, namespace = namespace)
+  # 
   
   # Generate heights based on method
   if(method == 'bits'){
@@ -82,6 +82,10 @@ logo_data <- function( seqs, method='bits', stack_width=0.95,
   }else if(method == 'custom'){
     if(seq_type == 'auto') seq_type = guessSeqType(rownames(seqs))
     hh = matrix_to_heights(seqs, seq_type, decreasing = rev_stack_order)
+  }else if(method == 'tsl'){
+    hh = twosamplelogo_method(seqs, seqs_bg, pval_thresh=pval_thresh, test = test, 
+                              seq_type = seq_type, namespace = namespace)
+    print(hh)
   }else{
     stop('Invalid method!')
   }
@@ -134,6 +138,9 @@ theme_logo <- function(base_size=12, base_family=''){
 #' @param low_col,high_col Colors for low and high ends of the gradient if a quantitative color scheme is used (default: "black" and "yellow").
 #' @param na_col Color for letters missing in color scheme (default: "grey20")
 #' @param plot If \code{FALSE}, plotting data is returned 
+#' @param bg_data Background data if twosamplelogo (tsl) method used, otherwise ignored
+#' @param pval_thresh Pvalue threshold if twosamplelogo (tsl) method used, otherwise ignored
+#' @param test type of statistical test to used if twosamplelogo (tsl) method used, otherwise ignored
 #' @param ... Additional arguments passed to layer params
 #' 
 #' @export
@@ -149,14 +156,14 @@ theme_logo <- function(base_size=12, base_family=''){
 geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NULL,
                       font='roboto_medium', stack_width=0.95, rev_stack_order=F, col_scheme = 'auto',
                       low_col='black', high_col='yellow', na_col='grey20',
-                      plot=T, ...) {
+                      plot=T, bg_data=NULL, pval_thresh=0.05, test='t.test', ...) {
   
   if(stack_width > 1 | stack_width <= 0) stop('"stack_width" must be between 0 and 1')
   if(is.null(data)) stop('Missing "data" parameter!')
   if(!is.null(namespace)) seq_type = 'other'
   
   # Validate method
-  all_methods = c('bits', 'probability','custom')#, 'tsl')
+  all_methods = c('bits', 'probability','custom', 'tsl')
   pind = pmatch(method, all_methods)
   method = all_methods[pind]
   if(is.na(method)) stop("method must be one of 'bits' or 'probability', or 'custom'")
@@ -175,7 +182,7 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
       curr_seqs = data[[n]]
       logo_data(seqs = curr_seqs, method = method, stack_width = stack_width, 
                 rev_stack_order = rev_stack_order, seq_group = n, seq_type = seq_type, 
-                font = font, namespace=namespace)
+                font = font, namespace=namespace, pval_thresh = pval_thresh, test=test, seqs_bg=bg_data)
     })
     data = do.call(rbind, data_sp)
     # Set factor for order of facet
@@ -338,3 +345,13 @@ NULL
 # p = ggseqlogo(sample_data$seqs_dna, nrow=3)
 # d = p$layers[[1]]$data
 # print(p)
+
+
+
+
+# setwd('~/Desktop/twosamplelogo/')
+# bg = readLines('nachra7_mua_reference.txt')[-1]
+# fg = readLines('nachra7_mua_sample.txt')[-1]
+# #mat = twosamplelogo_method(fg, bg)
+# ggplot() + geom_logo(data=fg, bg_data=bg, method='tsl', test='binom') 
+
