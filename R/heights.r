@@ -133,7 +133,7 @@ makePFM <- function(seqs, seq_type='auto', namespace=NULL, keep_letter_mat=F){
       pfm_mat = rbind(pfm_mat, miss)
     }
     
-    pfm_mat = pfm_mat[namespace,]
+    pfm_mat = pfm_mat[namespace, , drop=FALSE]
 
   }else{
     # Process sequences
