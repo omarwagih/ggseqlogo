@@ -9,14 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-<a href="http://omarwagih.github.io/ggseqlogo/">If you are not redirected, click here</a>
+<a href="http://omarwagih.github.io/ggseqlogo/">Click here for the ggseqlogo introduction</a>
 
 <html>
 <head>
-<meta http-equiv="refresh" content="0; url=http://omarwagih.github.io/ggseqlogo/" />
-<script language="javascript">
-    window.location.href = "http://omarwagih.github.io/ggseqlogo/"
-</script>
 </head>
 <body>
 </body>
