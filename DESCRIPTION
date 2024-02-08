@@ -4,7 +4,7 @@ Title: A 'ggplot2' Extension for Drawing Publication-Ready Sequence Logos
 Version: 0.1
 Date: 2017-07-25
 Author: Omar Wagih
-Maintainer: Omar Wagih <wagih@ebi.ac.uk>
+Maintainer: Omar Wagih <omarwagih@gmail.com>
 Description: The extensive range of functions provided by this package makes it possible to draw highly versatile sequence logos. Features include, but not limited to, modifying colour schemes and fonts used to draw the logo, generating multiple logo plots, and aiding the visualisation with annotations. Sequence logos can easily be combined with other plots 'ggplot2' plots.
 License: LGPL
 URL: https://github.com/omarwagih/ggseqlogo
