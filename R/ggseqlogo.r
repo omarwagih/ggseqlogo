@@ -214,7 +214,7 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
   
   # If letters and group are the same, don't draw legend
   guides_opts = NULL
-  if(identical(cs$letter, cs$group)) guides_opts = guides(fill=F)
+  if(identical(cs$letter, cs$group)) guides_opts = guides(fill = "none")
   
   y_lim = NULL
   extra_opts = NULL
