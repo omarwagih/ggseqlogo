@@ -216,12 +216,10 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
   guides_opts = NULL
   if(identical(cs$letter, cs$group)) guides_opts = guides(fill = "none")
   
-  y_lim = NULL
   extra_opts = NULL
   if(method == 'tsl'){
     y_lab = 'Depleted    Enriched'
     tmp = max(abs(data$y))
-    #y_lim = c(-tmp, tmp)
     row_a = row_b = data[1,]
     row_a$y = -tmp
     row_b$y = tmp
@@ -248,15 +246,8 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
     params = list(na.rm = T, ...)
   ) 
   
-  
-  breaks_fun = function(lim){
-    # account for multiplicatuce expansion factor of 0.05
-    1: floor( lim[2] / 1.05 )
-  }
-  
-  # Expand 0.05 addidtive 
-  list(logo_layer, scale_x_continuous(breaks = breaks_fun, labels = identity), 
-       ylab(y_lab), xlab(''), colscale_opts, guides_opts, coord_cartesian(ylim=y_lim), 
+  list(logo_layer,
+       ylab(y_lab), xlab(''), colscale_opts, guides_opts,
        extra_opts)
 }
 
