@@ -9,9 +9,9 @@ Description: The extensive range of functions provided by this package makes it 
 License: LGPL
 URL: https://github.com/omarwagih/ggseqlogo
 BugReports: https://github.com/omarwagih/ggseqlogo/issues
-Encoding: latin1
+Encoding: UTF-8
 Imports: ggplot2
-RoxygenNote: 6.0.1
+RoxygenNote: 7.3.2
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
