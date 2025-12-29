@@ -242,7 +242,7 @@ geom_logo <- function(data = NULL, method='bits', seq_type='auto', namespace=NUL
   # Create layer
   logo_layer = layer(
     stat = 'identity', data = data, 
-    mapping = aes_string(x = 'x', y = 'y', fill='group', group='group_by'), 
+    mapping = aes(x = x, y = y, fill=group, group=group_by), 
     geom = 'polygon', 
     position = 'identity', show.legend = NA, inherit.aes = F,
     params = list(na.rm = T, ...)
