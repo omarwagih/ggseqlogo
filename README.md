@@ -46,5 +46,9 @@ If you use ggseqlogo, please cite:
 Wagih, Omar. ggseqlogo: a versatile R package for drawing sequence logos. _Bioinformatics_ 33, no. 22 (2017): 3645-3647.
 [https://doi.org/10.1093/bioinformatics/btx469](https://doi.org/10.1093/bioinformatics/btx469) PMID: [29036507](https://www.ncbi.nlm.nih.gov/pubmed/29036507)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=omarwagih/ggseqlogo&type=date&legend=top-left)](https://www.star-history.com/#omarwagih/ggseqlogo&type=date&legend=top-left)
+
 ## Feedback
 If you have any feedback or suggestions, drop me a line at (omarwagih(at)gmail.com) or open an issue on github.
