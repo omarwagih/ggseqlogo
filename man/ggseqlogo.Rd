@@ -4,25 +4,31 @@
 \alias{ggseqlogo}
 \title{Quick sequence logo plot}
 \usage{
-ggseqlogo(data, facet = "wrap", scales = "free_x", ncol = NULL,
-  nrow = NULL, ...)
+ggseqlogo(
+  data,
+  facet = "wrap",
+  scales = "free_x",
+  ncol = NULL,
+  nrow = NULL,
+  ...
+)
 }
 \arguments{
 \item{data}{Character vector of sequences or named list of sequences. All sequences must have same width}
 
 \item{facet}{Facet type, can be 'wrap' or 'grid'}
 
-\item{scales}{Facet scales, see \code{\link{facet_wrap}}}
+\item{scales}{Facet scales, see \code{\link[ggplot2:facet_wrap]{facet_wrap}}}
 
-\item{ncol}{Number of columns, works only when \code{facet='wrap'}, see \code{\link{facet_wrap}}}
+\item{ncol}{Number of columns, works only when \code{facet='wrap'}, see \code{\link[ggplot2:facet_wrap]{facet_wrap}}}
 
 \item{nrow}{Number of rows, same as \code{ncol}}
 
 \item{...}{Additional arguments passed to \code{\link{geom_logo}}}
 }
 \description{
-\code{ggseqlogo} is a shortcut for generating sequence logos. 
-It adds the ggseqlogo theme \code{\link{theme_logo}} by default, and facets when multiple input data are provided. 
+\code{ggseqlogo} is a shortcut for generating sequence logos.
+It adds the ggseqlogo theme \code{\link{theme_logo}} by default, and facets when multiple input data are provided.
 It serves as a convenient wrapper, so to customise logos beyond the defaults here, please use \code{\link{geom_logo}}.
 }
 \examples{
@@ -30,10 +36,10 @@ It serves as a convenient wrapper, so to customise logos beyond the defaults her
 data(ggseqlogo_sample)
 
 # Plot a single DNA sequence logo
-p1 = ggseqlogo( seqs_dna[[1]] )
+p1 <- ggseqlogo(seqs_dna[[1]])
 print(p1)
 
 # Plot multiple sequence logos at once
-p2 = ggseqlogo( seqs_dna )
+p2 <- ggseqlogo(seqs_dna)
 print(p2)
 }

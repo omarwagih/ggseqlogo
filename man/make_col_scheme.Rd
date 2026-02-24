@@ -4,8 +4,13 @@
 \alias{make_col_scheme}
 \title{Create new sequence logo color scheme}
 \usage{
-make_col_scheme(chars = NULL, groups = NULL, cols = NULL, values = NULL,
-  name = "")
+make_col_scheme(
+  chars = NULL,
+  groups = NULL,
+  cols = NULL,
+  values = NULL,
+  name = ""
+)
 }
 \arguments{
 \item{chars}{Vector of one letter characters}

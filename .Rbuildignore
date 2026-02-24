@@ -7,3 +7,4 @@ docs/.*$
 inst/fonts/.*$
 README.md
 shiny/.*$
+.github/
